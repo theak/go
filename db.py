@@ -1,4 +1,5 @@
 import sqlite3
+import requests
 from flask import g
 
 DB = 'sqlite.db'
@@ -7,8 +8,11 @@ def get_url_from_name(name: str) -> str:
     link = query_db("SELECT url FROM link WHERE name = ?", [name], one=True)
     return None if link is None else link["url"]
 
-def get_all_links(limit: int = 100) -> list[sqlite3.Row]:
-    links = query_db("SELECT * FROM link LIMIT ?", [limit])
+def get_all_links(status_check: bool|None = None, limit: int = 100) -> list[sqlite3.Row]:
+    if (status_check is None):
+      links = query_db("SELECT * FROM link LIMIT ?", [limit])
+    else:
+      links = query_db("SELECT * FROM link WHERE status_check = ? LIMIT ?", [status_check, limit])
     return links
 
 def delete_link(id: int):
@@ -16,6 +20,9 @@ def delete_link(id: int):
 
 def create_url(name: str, url: str):
     modify_db("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
+
+def get_link_from_id(id: int) -> str:
+    return query_db("SELECT url FROM link WHERE id = ?", [id], one=True)
 
 def get_db():
     db = getattr(g, '_database', None)

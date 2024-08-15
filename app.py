@@ -1,6 +1,6 @@
 import requests
 from flask import Flask, g, render_template, request, redirect
-import db
+import db, status_check
 from urllib.parse import urlparse
 
 app = Flask(__name__)
@@ -11,6 +11,15 @@ DOMAIN = "go"
 def root(error: str|None = None):
     links = db.get_all_links()
     return render_template("submitlink.html", domain=DOMAIN, links=links, error=error)
+
+@app.route('/status', methods=['GET'])
+def status():
+    status_check.update_all_statuses()
+    links = db.get_all_links(status_check=False)
+    status_links = db.get_all_links(status_check=True)
+    statuses = status_check.get_statuses()
+    downtimes = status_check.get_last_downtimes()
+    return render_template("submitlink.html", domain=DOMAIN, links=links, status=True, status_links=status_links, statuses=statuses, downtimes=downtimes)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -36,15 +45,22 @@ def submit_link():
     db.create_url(name, url)
     return root()
 
-@app.route('/delete_link', methods=['POST'])
-def delete_link():
+@app.route('/update_link', methods=['POST'])
+def update_link():
     id = request.form.get('id')
+    action = request.form.get('action')
 
     if not id or not id.isnumeric():
         return root("Error: Invalid ID."), 400
 
-    db.delete_link(int(id))
-    return root()
+    if action == "delete":
+      db.delete_link(int(id))
+      return root()
+    elif action == "add_status_check":
+      status_check.set_status_check(int(id), True)
+    elif action == "remove_status_check":
+      status_check.set_status_check(int(id), False)
+    return status()
 
 ''' MISC ROUTES '''
 @app.route('/ping', methods=['GET'])
@@ -65,7 +81,7 @@ def close_connection(exception):
     return db.close_connection(exception)
 
 ''' HELPER FUNCTIONS '''
-def _is_valid_url(url):
+def _is_valid_url(url: str) -> bool:
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
