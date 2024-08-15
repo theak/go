@@ -3,30 +3,38 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>{{domain}}/ links</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
-      .container {padding: 30px; margin: 100px}
+      .container {padding: 30px; margin: 60px; background-color: #FAFAFA;}
+      .nopad {padding: 0px}
     </style>
   </head>
   <body style="background-color: #ddd;">
-    <div class="container" style="background-color: #FAFAFA;">
-      <h3>Add a new URL</h3>
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <div class="container">
+      <h5>Add a new URL</h5>
       <form method="post" action="/submit_link">
         <div class="row g-3 align-items-center">
           <div class="col-auto"></div>
           <div class="col-auto">
-            <label for="name" class="col-form-label">Short URL: go/</label>
+            <label for="name" class="col-form-label">Short URL: {{domain}}/</label>
           </div>
           <div class="col-auto">
-            <input id="name" class="form-control" placeholder="your-short-link" name="name">
+            <input id="name" class="form-control" placeholder="your-short-link" name="name"
+            {% if name %}
+            value="{{name}}" readonly
+            {% endif %}
+            />
           </div>
           <div class="col-auto"></div>
           <div class="col-md-1">
             <label for="url" class="col-form-label">Full URL:</label>
           </div>
           <div class="col-md-4">
-            <input id="url" type="url" class="form-control" placeholder="https://www.google.com" name="url">
+            <input id="url" type="url" class="form-control" placeholder="https://www.google.com" name="url"/>
           </div>
           <div class="col-auto">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -34,5 +42,35 @@
         </div>
       </form>
     </div>
+    {% if links %}
+      <div class="container">
+        <h5>Current links</h5>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Short link</th>
+              <th scope="col">Full URL</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in links %}
+            <tr>
+              <td>{{domain}}/{{ link.name }}</td>
+              <td><a href="{{ link.url }}">{{ link.url }}</a></td>
+              <td>
+                <form method="post" action="/delete_link" class="inline">
+                  <input type="hidden" name="id" value="{{ link.id }}" />
+                  <button type="submit" class="btn nopad">
+                    🗑️
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
   </body>
 </html>

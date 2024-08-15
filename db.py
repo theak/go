@@ -4,14 +4,18 @@ from flask import g
 DB = 'sqlite.db'
 
 def get_url_from_name(name: str) -> str:
-    return query_db("SELECT * FROM link WHERE name = ?", [name], one=True)
+    link = query_db("SELECT url FROM link WHERE name = ?", [name], one=True)
+    return None if link is None else link["url"]
+
+def get_all_links(limit: int = 100) -> list[sqlite3.Row]:
+    links = query_db("SELECT * FROM link LIMIT ?", [limit])
+    return links
+
+def delete_link(id: int):
+    modify_db("DELETE FROM link WHERE id = ?", [id])
 
 def create_url(name: str, url: str):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
-    db.commit()
-    db.close()
+    modify_db("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -37,3 +41,9 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+def modify_db(query, args=()):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(query, args)
+    db.commit()
