@@ -1,4 +1,4 @@
-import os
+import os, sys
 from flask import Flask, g, render_template, request, redirect, send_file
 import db
 from urllib.parse import urlparse
@@ -115,4 +115,5 @@ def _allowed_file(filename):
 
 if __name__ == '__main__':
     db.init_db(app)
-    app.run(debug=True)
+    if sys.argv[-1] != "init_db":
+      app.run(debug=True)
