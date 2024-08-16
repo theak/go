@@ -1,4 +1,3 @@
-import requests
 from flask import Flask, g, render_template, request, redirect
 import db
 from urllib.parse import urlparse

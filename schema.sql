@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS name_values (
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+INSERT OR IGNORE INTO name_values (name, value) VALUES
+    ("domain", "go"), ("port", 80);
