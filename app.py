@@ -22,7 +22,7 @@ def catch_all(path):
 
 @app.route('/settings', methods=['GET'])
 def settings():
-  return render_template("settings.html")
+  return render_template("settings.html", domain=DOMAIN)
 
 @app.route('/backup', methods=['GET'])
 def backup():

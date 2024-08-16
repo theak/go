@@ -9,6 +9,7 @@
       .container {padding: 30px; margin: 60px; background-color: #FAFAFA;}
       .domain {display: inline; width: 90%;}
       .row {line-height: 2.2; margin-bottom: 20px}
+      #hosts {display: inline}
     </style>
   </head>
   <body style="background-color: #ddd;">
@@ -20,11 +21,7 @@
             <div class="col-auto"></div>
             <div class="col-auto">Domain name:</div>
             <div class="col-md-2">
-              <input type="text" class="form-control domain" value="go" placeholder="go"><span> / </span>
-            </div>
-            <div class="col-auto">Port:</div>
-            <div class="col-md-2">
-              <input type="number" class="form-control" placeholder="80" value="80">
+              <input type="text" class="form-control domain" value="{{ domain }}" placeholder="go"><span> / </span>
             </div>
             <div class="col-auto">
               <button type="submit" class="btn btn-primary mb-2">Update</button>
@@ -61,7 +58,21 @@
           </div>
         </div>
 
-
-    </div>
+        <h5>Instructions</h5>
+        <div class="row">
+          <div class="col-auto"></div>
+          <div class="col-auto">Add the following line to your <pre id="hosts">/etc/hosts</pre> file:<br/>
+            <pre><span id="domain">[IP of your server]</span>   <span>{{ domain }}</span></pre>
+          </div>
+        </div>
+      </div>
+    <script>
+      if (navigator.platform.indexOf('Win') > -1) {
+        document.getElementById("hosts").innerHTML = "c:\\Windows\\System32\\Drivers\\etc\\hosts";
+      }
+      if (window.location.hostname.indexOf('.') > -1) {
+        document.getElementById("domain").innerHTML = window.location.hostname;
+      }
+    </script>
   </body>
 </html>
