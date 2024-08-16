@@ -30,7 +30,7 @@
         </form>
 
         <h5>Backup and restore</h5>
-        <form method="post" action="/backup">
+        <form method="post" action="/restore" enctype="multipart/form-data">
           <div class="row">
 
             <div class="col-auto"></div>
@@ -39,21 +39,21 @@
                 <input class="form-control" type="file" name="file">
             </div>
             <div class="col-md-2">
-              <buttom type="submit" class="btn btn-outline-success">Upload</buttom>
+              <button type="submit" class="btn btn-outline-success">Upload</buttom>
             </div>
           </div>
         </form>
 
         <div class="row">
           <div class="col-auto"></div>
-          <div class="col-md-2">
+          <div class="col-auto">
             <a href="/backup">
               <button type="button" class="btn btn-outline-primary">⬇️ Download backup</button>
             </a>
           </div>
           <div class="col-auto">
             <form method="post" action="/reset" onsubmit="return confirm('Do you really want to delete everything? This action cannot be undone!');">
-              <button type="submit" class="btn btn-outline-danger">💣 Delete all links and settings</button>
+              <button type="submit" class="btn btn-outline-danger">💣 Reset everything</button>
             </form>
           </div>
         </div>

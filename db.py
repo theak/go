@@ -1,4 +1,4 @@
-import os
+import os, shutil
 import sqlite3
 from flask import g
 
@@ -72,8 +72,10 @@ def is_sqlite_db(db_file):
     except sqlite3.Error:
         return False
 
-def reset_db(app):
+def reset_db(app, new_db = None):
   os.remove(DB)
+  if new_db is not None:
+    shutil.copy(new_db, DB)
   name_value_cache = {}
   init_db(app)
 

@@ -1,9 +1,16 @@
+import os
 from flask import Flask, g, render_template, request, redirect, send_file
 import db
 from urllib.parse import urlparse
 
 app = Flask(__name__)
 DOMAIN = "go"
+
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {'db'}
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 ''' MAIN ROUTES '''
 @app.route('/', methods=['GET'])
@@ -27,6 +34,27 @@ def settings():
 @app.route('/backup', methods=['GET'])
 def backup():
   return send_file(db.get_db_path(), as_attachment=True, download_name='sqlite.db')
+
+@app.route('/restore', methods=['POST'])
+def restore():
+    # Check if the POST request has the file part
+    if 'file' not in request.files:
+        return 'No file', 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return 'No selected file', 400
+
+    if file and _allowed_file(file.filename):
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], db.DB)
+        file.save(filepath)
+        if not db.is_sqlite_db(filepath):
+          return 'Corrupt DB', 400
+        db.reset_db(app, new_db=filepath)
+        return redirect('/')
+    else:
+        return 'File type not allowed', 400
 
 @app.route('/reset', methods=['POST'])
 def reset():
@@ -81,6 +109,9 @@ def _is_valid_url(url: str) -> bool:
         return all([result.scheme, result.netloc])
     except ValueError:
         return False
+
+def _allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 if __name__ == '__main__':
     db.init_db(app)
