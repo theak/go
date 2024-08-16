@@ -21,10 +21,14 @@ def root(error: str|None = None):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    url = db.get_url_from_name(path)
+    split_path = path.split('/', 1)
+    name = split_path[0]
+    url = db.get_url_from_name(name)
     if url is None:
-      return render_template("submitlink.html", name=path, domain=DOMAIN)
+      return render_template("submitlink.html", name=name, domain=DOMAIN)
     else:
+      if len(split_path) > 1:
+        url += split_path[1]
       return redirect(url)
 
 @app.route('/settings', methods=['GET'])
