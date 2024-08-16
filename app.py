@@ -31,6 +31,10 @@ def catch_all(path):
         url += split_path[1]
       return redirect(url)
 
+@app.route('/favicon.ico', methods=['GET'])
+def favicon():
+  return send_file("favicon.ico")
+
 @app.route('/settings', methods=['GET'])
 def settings():
   return render_template("settings.html", domain=DOMAIN)
