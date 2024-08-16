@@ -1,5 +1,5 @@
+import os
 import sqlite3
-import requests
 from flask import g
 
 DB = 'sqlite.db'
@@ -60,6 +60,22 @@ def modify_db(query, args=()):
     cur = db.cursor()
     cur.execute(query, args)
     db.commit()
+
+def get_db_path():
+    return os.path.join(os.getcwd(), DB)
+
+def is_sqlite_db(db_file):
+    try:
+        conn = sqlite3.connect(db_file)
+        conn.close()
+        return True
+    except sqlite3.Error:
+        return False
+
+def reset_db(app):
+  os.remove(DB)
+  name_value_cache = {}
+  init_db(app)
 
 def _get_db():
     db = getattr(g, '_database', None)

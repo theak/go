@@ -1,4 +1,4 @@
-from flask import Flask, g, render_template, request, redirect
+from flask import Flask, g, render_template, request, redirect, send_file
 import db
 from urllib.parse import urlparse
 
@@ -19,6 +19,19 @@ def catch_all(path):
       return render_template("submitlink.html", name=path, domain=DOMAIN)
     else:
       return redirect(url)
+
+@app.route('/settings', methods=['GET'])
+def settings():
+  return render_template("settings.html")
+
+@app.route('/backup', methods=['GET'])
+def backup():
+  return send_file(db.get_db_path(), as_attachment=True, download_name='sqlite.db')
+
+@app.route('/reset', methods=['POST'])
+def reset():
+  db.reset_db(app)
+  return redirect('/')
 
 @app.route('/submit_link', methods=['POST'])
 def submit_link():
