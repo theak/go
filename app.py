@@ -1,6 +1,6 @@
 import requests
 from flask import Flask, g, render_template, request, redirect
-import db, status_check
+import db
 from urllib.parse import urlparse
 
 app = Flask(__name__)
@@ -11,15 +11,6 @@ DOMAIN = "go"
 def root(error: str|None = None):
     links = db.get_all_links()
     return render_template("submitlink.html", domain=DOMAIN, links=links, error=error)
-
-@app.route('/status', methods=['GET'])
-def status():
-    status_check.update_all_statuses()
-    links = db.get_all_links(status_check=False)
-    status_links = db.get_all_links(status_check=True)
-    statuses = status_check.get_statuses()
-    downtimes = status_check.get_last_downtimes()
-    return render_template("submitlink.html", domain=DOMAIN, links=links, status=True, status_links=status_links, statuses=statuses, downtimes=downtimes)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -43,7 +34,7 @@ def submit_link():
         return root("Error: Invalid URL"), 400
 
     db.create_url(name, url)
-    return root()
+    return redirect('/')
 
 @app.route('/update_link', methods=['POST'])
 def update_link():
@@ -55,22 +46,13 @@ def update_link():
 
     if action == "delete":
       db.delete_link(int(id))
-      return root()
-    elif action == "add_status_check":
-      status_check.set_status_check(int(id), True)
-    elif action == "remove_status_check":
-      status_check.set_status_check(int(id), False)
-    return status()
+
+    if action == "rename":
+      db.rename_link(int(id), request.form.get('newName'))
+
+    return redirect('/')
 
 ''' MISC ROUTES '''
-@app.route('/ping', methods=['GET'])
-def ping():
-    r = requests.get("http://192.168.0.155:8123")
-    if r.status_code == 200:
-        return 'OK'
-    else:
-        return "Error: %d" % r.status_code, 400
-
 @app.route('/robots.txt', methods=['GET'])
 def robots():
     return Response('User-agent: *\nDisallow: /', mimetype='text/plain')

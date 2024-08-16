@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% set type = 'status check' if status else 'link' %}
-    <title>{{domain}}/ {{type}}s</title>
+    <title>{{domain}}/ links</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
       .container {padding: 30px; margin: 60px; background-color: #FAFAFA;}
@@ -12,10 +11,7 @@
     </style>
   </head>
   <body style="background-color: #ddd;">
-    {% if error %}
-      <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-    {% if not status %}
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     <div class="container">
       <h5>Add a new link</h5>
       <form method="post" action="/submit_link">
@@ -25,7 +21,7 @@
             <label for="name" class="col-form-label">{{domain}}/</label>
           </div>
           <div class="col-auto">
-            <input id="name" class="form-control" placeholder="your-{{type.replace(' ', '-')}}" name="name"
+            <input id="name" class="form-control" placeholder="your-link" name="name"
             {% if name %}
             value="{{name}}" readonly
             {% endif %}
@@ -44,62 +40,35 @@
         </div>
       </form>
     </div>
-    {% else %}
-      <div class="container">
-        <h5>Current status checks</h5>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col"></th>
-              <th scope="col">Current status</th>
-              <th scope="col">Last downtime</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for link in status_links %}
-            {% set status = statuses[link.id]|int %}
-            <tr>
-              <td>{{domain}}/{{ link.name }}</td>
-              <td><a href="{{ link.url }}">{{ link.url }}</a></td>
-              <td>{{ "🟢" if status<300 else "🟡" if status < 400 else "🔴"}} {{ status }}</td>
-              <td>{{ downtimes.get(link.id, "Never") }}</td>
-              <td>
-                <form method="post" action="/update_link" class="inline">
-                  <input type="hidden" name="id" value="{{ link.id }}" />
-                  <button type="submit" class="btn nopad" name="action" value="remove_status_check" title="Remove as status check">
-                    ➖ Remove
-                  </button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endif %}
     {% if links %}
       <div class="container">
         <h5>Current links</h5>
         <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Link</th>
+              <th scope="col">Full URL</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
           <tbody>
             {% for link in links %}
             <tr>
-              <td>{{domain}}/{{ link.name }}</td>
-              <td><a href="{{ link.url }}">{{ link.url }}</a></td>
+              <td style="cursor: pointer"
+                  onclick="rename({{ link.id }}, '{{domain}}/{{ link.name }}')">
+                {% if link.description %}{{ link.description }}{% else %}
+                <button type="button" class="btn btn-outline-secondary btn-sm">Add</button>
+                {% endif %}
+              </td>
+              <td><a href="{{ link.url }}" target="_blank">{{domain}}/{{ link.name }}</a> <sup>↗</sup></td>
+              <td>{{ link.url }}</td>
               <td>
                 <form method="post" action="/update_link" class="inline">
                   <input type="hidden" name="id" value="{{ link.id }}" />
-                  {% if status %}
-                  <button type="submit" class="btn nopad" name="action" value="add_status_check" title="Add as status check">
-                    ➕ Add as status check
-                  </button>
-                  {% else %}
                   <button type="submit" class="btn nopad" name="action" value="delete">
                     🗑️
                   </button>
-                  {% endif %}
                 </form>
               </td>
             </tr>
@@ -108,9 +77,24 @@
         </table>
       </div>
     {% endif %}
-    <div class="text-center text-muted" style="font-size: 10px">
-      {% if status %}<a href="/">URL shortener</a> | <b>Status checker</b>
-      {% else %}<b>URL shortener</b> | <a href="/status">Status checker</a>{% endif %}
-    </div>
+  <script>
+    function rename(link_id, link_name) {
+      const newName =  prompt("Name for " + link_name);
+      if (newName !== null) {
+        const formData = new FormData();
+        formData.append("id", link_id);
+        formData.append("newName", newName);
+        formData.append("action", "rename");
+        try {
+          const response = fetch("/update_link", {
+            method: "POST",
+            body: formData,
+          }).then(() => window.location.reload());
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  </script>
   </body>
 </html>
