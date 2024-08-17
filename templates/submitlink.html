@@ -63,7 +63,7 @@
                 {% endif %}
               </td>
               <td><a href="{{ link.url }}" target="_blank">{{domain}}/{{ link.name }}</a> <sup>↗</sup></td>
-              <td>{{ link.url }}</td>
+              <td title="{{ link.url }}" ondblclick="expand(this)">{{ link.url|truncate(80) }}</td>
               <td>
                 <form method="post" action="/update_link" class="inline">
                   <input type="hidden" name="id" value="{{ link.id }}" />
@@ -82,6 +82,9 @@
       <a class="link-secondary link-offset-2" href="/settings">settings</a>
     </div>
   <script>
+    function expand(td) {
+      td.innerHTML = td.title;
+    }
     function rename(link_id, link_name) {
       const newName =  prompt("Name for " + link_name);
       if (newName !== null) {
