@@ -18,7 +18,8 @@ Create and manage custom go/ links for any local network or enterprise.
 
 1. Clone the repo: ```git clone https://github.com/theak/go```
 2. In a virtual env, run ```pip install -r requirements.txt```
-3. Run ```flask --app app --debug run``` to start the local web server in debug mode
+3. Run ```python app.py init_db``` to initialize the db
+4. Run ```FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999``` to start the local web server in debug mode with external connections (customize as needed)
 
 ### Step 2: Set up a domain to point to the server
 

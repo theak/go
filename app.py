@@ -4,6 +4,7 @@ import db
 from urllib.parse import urlparse
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False  # Disable strict slashes
 DOMAIN = "go"
 
 UPLOAD_FOLDER = 'uploads'
