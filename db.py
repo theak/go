@@ -10,7 +10,7 @@ def get_url_from_name(name: str) -> str:
     link = query_db("SELECT url FROM link WHERE name = ?", [name], one=True)
     return None if link is None else link["url"]
 
-def get_all_links(limit: int = 100) -> list[sqlite3.Row]:
+def get_all_links(limit: int = 1000) -> list[sqlite3.Row]:
     links = query_db("""SELECT * FROM link
       ORDER BY description IS NOT NULL DESC, id ASC
       LIMIT ?""", [limit])
