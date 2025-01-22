@@ -14,26 +14,17 @@
       <form method="post" action="/submit_link">
         <div class="row g-3 align-items-center">
           <div class="col-auto"></div>
-          <div class="col-auto">
-            <label for="name" class="col-form-label">{{domain}}/</label>
-          </div>
+          <div class="col-auto"><label for="name" class="col-form-label">{{domain}}/</label></div>
           <div class="col-auto">
             <input id="name" class="form-control" placeholder="your-link" name="name"
-            {% if name %}
-            value="{{name}}" readonly
-            {% endif %}
-            />
+            {% if name %}value="{{name}}" readonly{% endif %}/>
           </div>
           <div class="col-auto"></div>
-          <div class="col-auto">
-            <label for="url" class="col-form-label">Full URL:</label>
-          </div>
+          <div class="col-auto"><label for="url" class="col-form-label">Full URL:</label></div>
           <div class="col-md-4">
-            <input id="url" type="url" class="form-control" placeholder="https://www.google.com" name="url"/>
+            <input id="url" type="url" class="form-control" placeholder="https://www.google.com/" name="url"/>
           </div>
-          <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
+          <div class="col-auto"><button type="submit" class="btn btn-primary">Submit</button></div>
         </div>
       </form>
     </div>
@@ -45,10 +36,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Link</th>
-              <th scope="col">Full URL</th>
-              <th scope="col"></th>
+              <th scope="col">Name</th><th scope="col">Link</th><th scope="col">Full URL</th><th scope="col"></th>
             </tr>
           </thead>
           <tbody>
@@ -74,27 +62,6 @@
         </table>
       </div>
     {% endif %}
-  <script>
-    function expand(td) {
-      td.innerHTML = td.title;
-    }
-    function rename(link_id, link_name) {
-      const newName =  prompt("Name for " + link_name);
-      if (newName !== null) {
-        const formData = new FormData();
-        formData.append("id", link_id);
-        formData.append("newName", newName);
-        formData.append("action", "rename");
-        try {
-          const response = fetch("/update_link", {
-            method: "POST",
-            body: formData,
-          }).then(() => window.location.reload());
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-  </script>
+    <script src="/static/submitlink.js"></script>
   </body>
 </html>

@@ -11,63 +11,59 @@
     <div class="container">
       <div><a href="/">‹ Home</a></div><br/>
       <h5>Server settings</h5>
-        <form class="form-inline">
-          <div class="row">
-            <div class="col-auto"></div>
-            <div class="col-auto">Domain name:</div>
-            <div class="col-md-2">
-              <input type="text" class="form-control domain" value="{{ domain }}" placeholder="go"><span> / </span>
-            </div>
-            <div class="col-auto">
-              <button type="submit" class="btn btn-primary mb-2">Update</button>
-            </div>
-          </div>
-        </form>
-
-        <h5>Backup and restore</h5>
-        <form method="post" action="/restore" enctype="multipart/form-data">
-          <div class="row">
-
-            <div class="col-auto"></div>
-            <div class="col-auto">⬆️ Restore backup:</div>
-            <div class="col-auto">
-                <input class="form-control" type="file" name="file">
-            </div>
-            <div class="col-md-2">
-              <button type="submit" class="btn btn-outline-success">Upload</buttom>
-            </div>
-          </div>
-        </form>
-
+      <form class="form-inline">
         <div class="row">
           <div class="col-auto"></div>
-          <div class="col-auto">
-            <a href="/backup">
-              <button type="button" class="btn btn-outline-primary">⬇️ Download backup</button>
-            </a>
+          <div class="col-auto">Domain name:</div>
+          <div class="col-md-2">
+            <input type="text" class="form-control domain" value="{{ domain }}" placeholder="go"><span> / </span>
           </div>
+          <div class="col-auto"><button type="submit" class="btn btn-primary mb-2">Update</button></div>
+        </div>
+      </form>
+    </div>
+    <div class="container">
+      <h5>Backup and restore</h5>
+      <form method="post" action="/restore" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-auto"></div>
+          <div class="col-auto">⬆️ Restore backup:</div>
           <div class="col-auto">
-            <form method="post" action="/reset" onsubmit="return confirm('Do you really want to delete everything? This action cannot be undone!');">
-              <button type="submit" class="btn btn-outline-danger">💣 Reset everything</button>
-            </form>
+            <input class="form-control" type="file" name="file" onchange="document.getElementById('upload-btn').classList.remove('d-none')">
+          </div>
+          <div class="col-md-2">
+            <button id="upload-btn" type="submit" class="btn btn-outline-success d-none">Upload</button>
           </div>
         </div>
-
-        <h5>Instructions</h5>
-        <div class="row">
-          <div class="col-auto"></div>
-          <div class="col-auto">Add the following line to your <pre id="hosts">/etc/hosts</pre> file:<br/>
-            <pre><span id="domain">[IP of your server]</span>   <span>{{ domain }}</span></pre>
-          </div>
+      </form>
+      <div class="row">
+        <div class="col-auto"></div>
+        <div class="col-auto">
+          <a href="/backup">
+            <button type="button" class="btn btn-outline-primary">⬇️ Download backup</button>
+          </a>
+        </div>
+        <div class="col-auto">
+          <form method="post" action="/reset" onsubmit="return confirm('Do you really want to delete everything? This action cannot be undone!');">
+            <button type="submit" class="btn btn-outline-danger">💣 Reset everything</button>
+          </form>
         </div>
       </div>
+    </div>
+    <div class="container">
+      <h5>Instructions</h5>
+      <div class="row">
+        <div class="col-auto"></div>
+        <div class="col-auto">Add the following line to your <pre id="hosts">/etc/hosts</pre> file:<br/>
+          <pre><span id="domain">[IP of your server]</span>   <span>{{ domain }}</span></pre>
+        </div>
+      </div>
+    </div>
     <script>
-      if (navigator.platform.indexOf('Win') > -1) {
+      if (navigator.platform.indexOf('Win') > -1)
         document.getElementById("hosts").innerHTML = "c:\\Windows\\System32\\Drivers\\etc\\hosts";
-      }
-      if (window.location.hostname.indexOf('.') > -1) {
+      if (window.location.hostname.indexOf('.') > -1)
         document.getElementById("domain").innerHTML = window.location.hostname;
-      }
     </script>
   </body>
 </html>
