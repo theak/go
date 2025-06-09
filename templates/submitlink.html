@@ -10,7 +10,9 @@
   <body>
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     <div class="container">
-      <h5>Add a new link</h5>
+      <h5>Add a new link
+        <a class="link-secondary gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
+      </h5>
       <form method="post" action="/submit_link">
         <div class="row g-3 align-items-center">
           <div class="col-auto"></div>
