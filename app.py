@@ -115,7 +115,7 @@ def close_connection(exception):
 def _is_valid_url(url: str) -> bool:
     try:
         result = urlparse(url)
-        return all([result.scheme, result.netloc])
+        return all([result.scheme, result.netloc or result.path])
     except ValueError:
         return False
 
