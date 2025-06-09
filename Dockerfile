@@ -1,7 +1,9 @@
-FROM python:3.11-slim
-RUN apt-get update && apt-get install git -y
-RUN git clone https://github.com/theak/go.git
+FROM python:3.11-alpine
 WORKDIR /go
-RUN pip install -r requirements.txt
-RUN python3.11 app.py init_db
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+COPY . .
+RUN python app.py init_db
+ENV PATH=/root/.local/bin:$PATH
+EXPOSE 9999
 CMD ["waitress-serve", "--host", "0.0.0.0", "--port", "9999", "app:app"]
