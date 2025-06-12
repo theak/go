@@ -1,6 +1,12 @@
 # go/: A handy URL shortener that you can self host
 
-Create and manage custom go/ links for any local network or enterprise.
+Create and manage custom go/ links for any local network or enterprise. Open source, simple (<200 lines of code), and fast.
+
+Create custom redirects on your local network like:
+
+`go/short-url` &rarr; https://example.com/my-much-longer-url
+
+# Deploying the go/ server
 
 ## Step 1: Pull and run the docker container
 
@@ -27,20 +33,19 @@ Edit `/etc/hosts` on your local machine(s) or Pi-Hole to redirect go/ (or the in
 	- `pihole restartdns`
 
 
-### Local development (optional)
 
-#### Running directly
+# Local development
 
 1. Clone the repo: ```git clone https://github.com/theak/go```
-2. In a virtual env, run ```pip install -r requirements.txt```
+2. Create a virtual env and run ```pip install -r requirements.txt```
 3. Run ```python app.py init_db``` to initialize the db
 4. Run ```FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999``` to start the local web server in debug mode with external connections (customize as needed)
 
-#### Building the Docker container locally
+### Building the Docker container
 
-1. ```docker build -t go -f Dockerfile .``` to build the docker container
-2. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
+1. ```docker build -t go -f Dockerfile .``` to build the docker container.
+3. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
    1. This assumes you want to run on port `80` on the host machine. Change this if you want to run it on a different port.
    2. Navigate to http://192.168.0.xxx/ to load the web interface (replace `192.168.0.xxx` with your server's IP).
    3. Use http://192.168.0.xxx/settings to configure custom settings, such as your domain name if it's not `go/`.
-3. ```docker run -d -p 80:9999 --restart unless-stopped go``` to deploy
+4. ```docker run -d -p 80:9999 --restart unless-stopped go``` to deploy
