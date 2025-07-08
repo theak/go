@@ -12,7 +12,7 @@ function rename(link_id, link_name) {
       const response = fetch("/update_link", {
         method: "POST",
         body: formData,
-      }).then(() => window.location.reload());
+      }).then(() => window.location.href = "/");
     } catch (e) {
       console.error(e);
     }
