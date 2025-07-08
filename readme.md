@@ -38,8 +38,9 @@ Edit `/etc/hosts` on your local machine(s) or Pi-Hole to redirect go/ (or the in
 
 1. Clone the repo: ```git clone https://github.com/theak/go```
 2. Create a virtual env and run ```pip install -r requirements.txt```
-3. Run ```python app.py init_db``` to initialize the db
-4. Run ```FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999``` to start the local web server in debug mode with external connections (customize as needed)
+3. Run ```pytest test_app.py``` to run the tests
+4. Run ```python app.py init_db``` to initialize the db
+5. Run ```FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999``` to start the local web server in debug mode with external connections (customize as needed)
 
 ### Building the Docker container
 
