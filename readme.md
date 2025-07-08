@@ -43,8 +43,10 @@ Edit `/etc/hosts` on your local machine(s) or Pi-Hole to redirect go/ (or the in
 
 ### Building the Docker container
 
-1. ```docker build -t go -f Dockerfile .``` to build the docker container.
-3. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
+1. ```docker build -t go -f Dockerfile .``` to build the docker container
+   - For multiple architectures: ```docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile .```
+   - To push to a registry: ```docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile . --push```
+2. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
    1. This assumes you want to run on port `80` on the host machine. Change this if you want to run it on a different port.
    2. Navigate to http://192.168.0.xxx/ to load the web interface (replace `192.168.0.xxx` with your server's IP).
    3. Use http://192.168.0.xxx/settings to configure custom settings, such as your domain name if it's not `go/`.

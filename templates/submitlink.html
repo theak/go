@@ -9,6 +9,7 @@
   </head>
   <body>
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
     <div class="container">
       <h5>Add a new link
         <a class="link-secondary gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
