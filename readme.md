@@ -1,56 +1,64 @@
-# go/: A handy URL shortener that you can self host
+# go/: Self-hosted URL shortener
 
-Create and manage custom go/ links for any local network or enterprise. Open source, simple (<200 lines of code), and fast.
+Create and manage custom go/ links for local networks or enterprises. Open source, simple (<200 lines of code), and fast.
 
-Create custom redirects on your local network like:
+Create custom redirects like:
+`go/short-url` → https://example.com/my-much-longer-url
 
-`go/short-url` &rarr; https://example.com/my-much-longer-url
+## Installation
 
-# Deploying the go/ server
+### Step 1: Run the service as a Docker container
 
-## Step 1: Pull and run the docker container
+```bash
+# Pull the latest image
+docker pull akshaykannan/go
 
-Pull the latest image
-```docker pull akshaykannan/go```
+# Run the container
+docker run -d -p 80:9999 --restart unless-stopped -v /host/path/to/db:/go/db akshaykannan/go
+```
 
-Run the container
-```docker run -d -p 80:9999 --restart unless-stopped -v /host/path/to/db:/go/db akshaykannan/go```
+The app will be available at `http://localhost` (or port 80 of your machine).
 
-The app will be available at `http://localhost` (or on port 80 of the machine you're running it on)
+**Note:** Replace `/host/path/to/db` with where you want to persist the database.
 
-**Note:** Replace `/host/path/to/db` with the actual path where you want to persist the database on your host machine.
+### Step 2: Set up DNS
 
-## Step 2: Set up internal DNS to point to the server
+Configure your DNS to point `go` to your server by editing your `hosts` file:
+- On Linux/Mac/Pi-hole: `sudo nano /etc/hosts`
+- On Windows: edit `C:\Windows\System32\drivers\etc\hosts` as administrator
 
-Edit `/etc/hosts` on your local machine(s) or Pi-Hole to redirect go/ (or the internal URL of your choice) to the server.
+If on Pi-hole, then run: `pihole restartdns`
 
-1. Edit your hosts file
-	- On Linux/Mac/Pi-Hole: `sudo nano /etc/hosts`
-	- On Windows: edit `C:\Windows\System32\drivers\etc\hosts` as an administrator
-2. Add the following line to it:
-	- ```192.168.0.XXX    go```
-		- Replace `192.168.0.XXX` with the IP address of your server running `go` or `127.0.0.1` if running locally
-		- Replace `go` with another custom domain name if you desire to use a different name.
-3. If on Pi-Hole, restart DNS:
-	- `pihole restartdns`
+Access the web interface at `http://192.168.0.xxx/` and configure settings at `http://192.168.0.xxx/settings`.
 
 
+## Local Development (only if you want to make changes)
 
-# Local development
+1. Clone the repository: `git clone https://github.com/theak/go`
 
-1. Clone the repo: ```git clone https://github.com/theak/go```
-2. Create a virtual env and run ```pip install -r requirements.txt```
-3. Run ```pytest test_app.py``` to run the tests
-4. Run ```python app.py init_db``` to initialize the db
-5. Run ```FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999``` to start the local web server in debug mode with external connections (customize as needed)
+2. Set up Python environment: `pip install -r requirements.txt`
 
-### Building the Docker container
+3. Initialize database: `python app.py init_db`
 
-1. ```docker build -t go -f Dockerfile .``` to build the docker container
-   - For multiple architectures: ```docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile .```
-   - To push to the registry: ```docker buildx build --platform linux/amd64,linux/arm64 -t akshaykannan/go -f Dockerfile . --push```
-2. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
-   1. This assumes you want to run on port `80` on the host machine. Change this if you want to run it on a different port.
-   2. Navigate to http://192.168.0.xxx/ to load the web interface (replace `192.168.0.xxx` with your server's IP).
-   3. Use http://192.168.0.xxx/settings to configure custom settings, such as your domain name if it's not `go/`.
-4. ```docker run -d -p 80:9999 --restart unless-stopped -v /path/to/go-db:/go/db go``` to deploy
+4. Run tests: `bash pytest test_app.py`
+
+5. Start development server: `FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999`
+
+### Building Docker image
+
+```bash
+# Build for current architecture
+docker build -t go -f Dockerfile .
+
+# Build for multiple architectures
+docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile .
+
+# Build and push to registry
+docker buildx build --platform linux/amd64,linux/arm64 -t akshaykannan/go -f Dockerfile . --push
+
+# Test the image
+docker run -it -p 80:9999 go
+
+# Deploy
+docker run -d -p 80:9999 --restart unless-stopped -v /path/to/go-db:/go/db go
+```
