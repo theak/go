@@ -14,9 +14,11 @@ Pull the latest image
 ```docker pull akshaykannan/go```
 
 Run the container
-```docker run -d -p 80:9999 --restart unless-stopped akshaykannan/go```
+```docker run -d -p 80:9999 --restart unless-stopped -v /host/path/to/db:/go/db akshaykannan/go```
 
 The app will be available at `http://localhost` (or on port 80 of the machine you're running it on)
+
+**Note:** Replace `/host/path/to/db` with the actual path where you want to persist the database on your host machine.
 
 ## Step 2: Set up internal DNS to point to the server
 
@@ -46,9 +48,9 @@ Edit `/etc/hosts` on your local machine(s) or Pi-Hole to redirect go/ (or the in
 
 1. ```docker build -t go -f Dockerfile .``` to build the docker container
    - For multiple architectures: ```docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile .```
-   - To push to a registry: ```docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile . --push```
+   - To push to the registry: ```docker buildx build --platform linux/amd64,linux/arm64 -t akshaykannan/go -f Dockerfile . --push```
 2. ```docker run -it -p 80:9999 go``` to make sure everything works, then ctrl+C to stop
    1. This assumes you want to run on port `80` on the host machine. Change this if you want to run it on a different port.
    2. Navigate to http://192.168.0.xxx/ to load the web interface (replace `192.168.0.xxx` with your server's IP).
    3. Use http://192.168.0.xxx/settings to configure custom settings, such as your domain name if it's not `go/`.
-4. ```docker run -d -p 80:9999 --restart unless-stopped go``` to deploy
+4. ```docker run -d -p 80:9999 --restart unless-stopped -v /path/to/go-db:/go/db go``` to deploy

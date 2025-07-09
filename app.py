@@ -69,6 +69,7 @@ def restore():
 
     if file and _allowed_file(file.filename):
         filepath = os.path.join(app.config["UPLOAD_FOLDER"], db.DB)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         file.save(filepath)
         if not db.is_sqlite_db(filepath):
             return "Corrupt DB", 400

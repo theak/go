@@ -2,7 +2,7 @@ import os, shutil
 import sqlite3
 from flask import g
 
-DB = 'sqlite.db'
+DB = 'db/sqlite.db'
 
 name_value_cache = {}
 
@@ -44,6 +44,7 @@ def close_connection(exception):
 
 def init_db(app):
     with app.app_context():
+        os.makedirs(os.path.dirname(DB), exist_ok=True)
         db = _get_db()
         with app.open_resource('schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
