@@ -17,26 +17,29 @@ Create custom redirects like:
 docker pull akshaykannan/go
 
 # Run the container
+docker run -d -p 80:9999 --restart unless-stopped akshaykannan/go
+```
+```bash
+# Optionally, run with the database volume mounted for easy backups
 docker run -d -p 80:9999 --restart unless-stopped -v [/host/path/to/db]:/go/db akshaykannan/go
 ```
 
-The app will be available at `http://localhost` (or port 80 of your machine).
-
-**Note:** Replace `[/host/path/to/db]` with where you want to persist the database on the host.
+The app will be available at `http://localhost` (or port 80 of the server running the container).
 
 ### Step 2: Configure DNS for `go` to work
 
 1. Edit your `hosts` file:
-- On Linux/Mac/Pi-hole: `sudo nano /etc/hosts`
+- On Linux/Mac: `sudo nano /etc/hosts`
 - On Windows: edit `C:\Windows\System32\drivers\etc\hosts` as administrator
+
 2. Add this line:
   ```192.168.0.[xxx]   go```
 
-  Replacing the first part with the ip address of your machine running the `go` docker container (use 127.0.0.1 if you're running it on your local machine).
+Replace the ip address with the ip address of the server running `go` (use `127.0.0.1` if it's your local machine).
 
-Access the web interface at `http://192.168.0.xxx/` and configure settings at `http://192.168.0.xxx/settings`.
+3. Access the web interface at `http://192.168.0.xxx/` and configure settings at `http://192.168.0.xxx/settings`.
 
-And that's it! You're now up and running with your own `go/` redirection service.
+And that's it! You're now up and running with your own local, private `go/` URL redirection service.
 
 ## Local Development (only if you want to make changes)
 
