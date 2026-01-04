@@ -151,29 +151,28 @@ def test_update_link_invalid_id(client, mock_db):
 
 
 def test_backup_route(client, mock_db):
-    """Test GET /backup returns database file"""
-    mock_db.get_db_path.return_value = '/path/to/sqlite.db'
-    
-    with patch('app.send_file') as mock_send:
-        mock_send.return_value = MagicMock()
-        response = client.get('/backup')
-        mock_send.assert_called_once_with('/path/to/sqlite.db', as_attachment=True, download_name='sqlite.db')
+    """Test GET /backup returns JSON export"""
+    mock_db.export_links_json.return_value = '{"version": 1, "links": []}'
+
+    response = client.get('/backup')
+    assert response.status_code == 200
+    assert response.content_type == 'application/json'
+    assert response.headers['Content-Disposition'] == 'attachment;filename=links.json'
+    mock_db.export_links_json.assert_called_once()
 
 
 def test_restore_route_success(client, mock_db):
-    """Test POST /restore with valid database file"""
-    mock_db.is_sqlite_db.return_value = True
-    mock_db.reset_db.return_value = None
-    mock_db.DB = 'sqlite.db'
-    
-    with tempfile.NamedTemporaryFile(suffix='.db') as temp_file:
-        temp_file.write(b'test db content')
-        temp_file.seek(0)
-        
-        response = client.post('/restore', data={
-            'file': (temp_file, 'test.db')
-        })
-        assert response.status_code == 302
+    """Test POST /restore with valid JSON file"""
+    mock_db.import_links_json.return_value = 2
+
+    import io
+    json_content = b'{"version": 1, "links": [{"name": "test", "url": "https://example.com"}]}'
+
+    response = client.post('/restore', data={
+        'file': (io.BytesIO(json_content), 'links.json')
+    })
+    assert response.status_code == 302
+    mock_db.import_links_json.assert_called_once()
 
 
 def test_restore_route_no_file(client, mock_db):

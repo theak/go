@@ -1,3 +1,4 @@
+import json
 import os, shutil
 import sqlite3
 from flask import g
@@ -37,6 +38,22 @@ def rename_link(id: int, newName: str):
 def create_url(name: str, url: str):
     modify_db("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
 
+def export_links_json() -> str:
+    links = query_db("SELECT name, url, description FROM link")
+    return json.dumps({
+        "version": 1,
+        "links": [{"name": l["name"], "url": l["url"], "description": l["description"]} for l in links]
+    }, indent=2)
+
+def import_links_json(json_str: str) -> int:
+    data = json.loads(json_str)
+    for link in data.get("links", []):
+        modify_db("""
+            INSERT INTO link (name, url, description) VALUES (?, ?, ?)
+            ON CONFLICT(name) DO UPDATE SET url=excluded.url, description=excluded.description
+        """, (link["name"], link["url"], link.get("description")))
+    return len(data.get("links", []))
+
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
@@ -64,14 +81,6 @@ def modify_db(query, args=()):
 
 def get_db_path():
     return os.path.join(os.getcwd(), DB)
-
-def is_sqlite_db(db_file):
-    try:
-        conn = sqlite3.connect(db_file)
-        conn.close()
-        return True
-    except sqlite3.Error:
-        return False
 
 def reset_db(app, new_db = None):
   os.remove(DB)

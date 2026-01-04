@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from urllib.parse import urlparse
@@ -10,11 +11,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False  # Disable strict slashes
 DOMAIN = "go"
 
-UPLOAD_FOLDER = "uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-ALLOWED_EXTENSIONS = {"db"}
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+ALLOWED_EXTENSIONS = {"json"}
 
 """ MAIN ROUTES """
 
@@ -53,30 +50,28 @@ def settings():
 
 @app.route("/backup", methods=["GET"])
 def backup():
-    return send_file(db.get_db_path(), as_attachment=True, download_name="sqlite.db")
+    json_data = db.export_links_json()
+    return Response(json_data, mimetype="application/json",
+                    headers={"Content-Disposition": "attachment;filename=links.json"})
 
 
 @app.route("/restore", methods=["POST"])
 def restore():
-    # Check if the POST request has the file part
     if "file" not in request.files:
         return "No file", 400
 
     file = request.files["file"]
-
     if file.filename == "":
         return "No selected file", 400
-
-    if file and _allowed_file(file.filename):
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], db.DB)
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        file.save(filepath)
-        if not db.is_sqlite_db(filepath):
-            return "Corrupt DB", 400
-        db.reset_db(app, new_db=filepath)
-        return redirect("/")
-    else:
+    if not _allowed_file(file.filename):
         return "File type not allowed", 400
+
+    try:
+        json_str = file.read().decode("utf-8")
+        db.import_links_json(json_str)
+        return redirect("/")
+    except (json.JSONDecodeError, KeyError) as e:
+        return f"Invalid JSON: {e}", 400
 
 
 @app.route("/reset", methods=["POST"])
