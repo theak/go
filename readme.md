@@ -46,7 +46,7 @@ And that's it! You're now up and running with your own local, private `go/` URL 
 1. Clone the repository: `git clone https://github.com/theak/go`
 2. Set up Python environment: `pip install -r requirements.txt`
 3. Initialize database: `python app.py init_db`
-4. Run tests: `bash pytest test_app.py`
+4. Run tests: `pytest test_app.py`
 5. Start development server: `FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999`
 
 ### Building Docker image
