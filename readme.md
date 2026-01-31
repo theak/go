@@ -12,21 +12,14 @@ Create custom redirects like:
 
 ### Step 1: Run the Docker container
 
+**Run the container directly, or use [docker compose](https://www.composerize.com/):**
 ```bash
-# Pull the latest image
-docker pull akshaykannan/go
-
-# Run the container
-docker run -d -p 80:9999 --restart unless-stopped akshaykannan/go
-```
-```bash
-# Optionally, run with the database volume mounted for easy backups
-docker run -d -p 80:9999 --restart unless-stopped -v [/host/path/to/db]:/go/db akshaykannan/go
+docker run -d -p 80:9999 --restart unless-stopped -v [your_backup_dir]:/go/db akshaykannan/go
 ```
 
-The app will be available at `http://localhost` (or port 80 of the server running the container).
+The web interface will be available at `http://localhost/` (or port 80 of the server running the container).
 
-### Step 2: Configure DNS for `go` to work
+### Step 2: Configure DNS for `go/` to point to the Docker container
 
 1. Edit your `hosts` file:
 - On Linux/Mac: `sudo nano /etc/hosts`
@@ -37,7 +30,7 @@ The app will be available at `http://localhost` (or port 80 of the server runnin
 
 Replace the ip address with the ip address of the server running `go` (use `127.0.0.1` if it's your local machine).
 
-3. Access the web interface at `http://192.168.0.xxx/` and configure settings at `http://192.168.0.xxx/settings`.
+3. Access the web interface at `http://go/` and configure settings at `http://go/settings`. Once you've done this once, your browser should remember this and let you type in go/linkname.
 
 And that's it! You're now up and running with your own local, private `go/` URL redirection service.
 
@@ -49,21 +42,3 @@ And that's it! You're now up and running with your own local, private `go/` URL 
 4. Run tests: `pytest test_app.py`
 5. Start development server: `FLASK_DEBUG=1 flask run --host=0.0.0.0 --port=9999`
 
-### Building Docker image
-
-```bash
-# Build for current architecture
-docker build -t go -f Dockerfile .
-
-# Build for multiple architectures
-docker buildx build --platform linux/amd64,linux/arm64 -t go -f Dockerfile .
-
-# Build and push to registry
-docker buildx build --platform linux/amd64,linux/arm64 -t akshaykannan/go -f Dockerfile . --push
-
-# Test the image
-docker run -it -p 80:9999 go
-
-# Deploy
-docker run -d -p 80:9999 --restart unless-stopped -v /path/to/go-db:/go/db go
-```
