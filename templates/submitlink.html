@@ -11,26 +11,31 @@
     {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
     {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
     <div class="container">
-      <h5>Add a new link
+      <h5 class="pb-2">Create a new {{domain}} link
         <a class="link-secondary gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
       </h5>
       <form method="post" action="/submit_link">
-        <div class="row g-3 align-items-center">
-          <div class="col-auto"></div>
-          <div class="col-auto"><label for="name" class="col-form-label">{{domain}}/</label></div>
-          <div class="col-auto">
-            <input id="name" class="form-control" placeholder="your-link" name="name"
-            {% if name %}value="{{name}}" readonly{% endif %}/>
+        <div class="row g-3 align-items-end">
+          <div class="col-auto d-flex align-items-end">
+            <label for="name" class="col-form-label me-2">{{domain}}/</label>
+            <div>
+              <label for="name" class="text-muted ps-1 small d-block">Short link name</label>
+              <input id="name" class="form-control" placeholder="your-link" name="name"
+              {% if name %}value="{{name}}" readonly{% endif %}/>
+            </div>
           </div>
-          <div class="col-auto"></div>
-          <div class="col-auto"><label for="url" class="col-form-label">Full URL:</label></div>
-          <div class="col-md-4">
-            <input id="url" type="url" class="form-control" placeholder="https://www.google.com/" name="url"/>
+          <div class="col-auto d-flex align-items-end">
+            <label for="url" class="col-form-label me-2">Full URL:</label>
+            <div>
+              <label for="url" class="text-muted ps-1 small d-block">URL to point to</label>
+              <input id="url" type="url" class="form-control" style="width: 250px;" placeholder="https://www.google.com/" name="url"/>
+            </div>
           </div>
           <div class="col-auto"><button type="submit" class="btn btn-primary">Submit</button></div>
         </div>
       </form>
     </div>
+    {% if not links %}<center><small><a href="/">View all links</a></small></center>{% endif %}
     {% if links %}
       <div class="container">
         <h5>Current links
@@ -39,7 +44,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th scope="col">Name</th><th scope="col">Link</th><th scope="col">Full URL</th><th scope="col"></th>
+              <th scope="col">Name</th><th scope="col">Short Link</th><th scope="col">Full URL</th><th scope="col"></th>
             </tr>
           </thead>
           <tbody>
