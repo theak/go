@@ -112,6 +112,9 @@ def update_link():
     if action == "rename":
         db.rename_link(int(id), request.form.get("newName"))
 
+    if action == "edit_url":
+        db.update_url(int(id), request.form.get("newUrl"))
+
     return redirect("/")
 
 

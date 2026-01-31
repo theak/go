@@ -8,3 +8,7 @@ body {background-color: #ddd;}
 .row {line-height: 2.2; margin-bottom: 20px}
 .pre {background-color: #FFF;}
 #hosts {display: inline}
+
+.url-cell {cursor: pointer}
+.url-cell .edit-icon {opacity: 0; margin-left: 8px}
+.url-cell:hover .edit-icon {opacity: 0.6}

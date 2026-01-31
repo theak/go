@@ -35,6 +35,9 @@ def delete_link(id: int):
 def rename_link(id: int, newName: str):
     modify_db("UPDATE link SET description = ? WHERE id = ?", [newName, id])
 
+def update_url(id: int, new_url: str):
+    modify_db("UPDATE link SET url = ? WHERE id = ?", [new_url, id])
+
 def create_url(name: str, url: str):
     modify_db("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
 
