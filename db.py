@@ -41,9 +41,8 @@ def update_url(id: int, new_url: str):
 def create_url(name: str, url: str, description: str = None):
     modify_db("INSERT INTO link (name, url, description) VALUES (?, ?, ?)", (name, url, description))
 
-def get_note(name: str) -> str | None:
-    row = query_db("SELECT metadata FROM link WHERE name = ?", [name], one=True)
-    return None if row is None else json.loads(row["metadata"] or "{}").get("note", "")
+def get_link(name: str):
+    return query_db("SELECT * FROM link WHERE name = ?", [name], one=True)
 
 def set_note(name: str, content: str):
     modify_db("UPDATE link SET metadata = json_set(metadata, '$.note', ?) WHERE name = ?", [content, name])

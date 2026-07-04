@@ -99,7 +99,7 @@ def test_submit_link_blank_url_creates_note(client, mock_db):
 
 def test_note_get(client, mock_db):
     """Test GET /note/<name> renders editor with note content"""
-    mock_db.get_note.return_value = 'hello note content'
+    mock_db.get_link.return_value = {'id': 1, 'url': '/note/test', 'metadata': '{"note": "hello note content"}', 'created_date': '2026-07-03 12:34:56'}
 
     response = client.get('/note/test')
     assert response.status_code == 200
@@ -108,8 +108,7 @@ def test_note_get(client, mock_db):
 
 def test_note_save(client, mock_db):
     """Test POST /note/<name> creates the link row and saves content"""
-    mock_db.get_url_from_name.return_value = None
-    mock_db.get_note.return_value = 'new content'
+    mock_db.get_link.return_value = None
 
     response = client.post('/note/test', data={'content': 'new content'})
     assert response.status_code == 200

@@ -18,8 +18,15 @@
       </h5>
       <form method="post" action="/note/{{name}}">
         <textarea id="content" name="content" class="form-control mb-2" style="font-family: monospace" rows="20">{{content}}</textarea>
-        <div class="text-end"><button id="save" type="submit" class="btn btn-primary" disabled>Save</button></div>
+        <div class="d-flex align-items-center">
+          {% if id %}<button type="submit" form="delete" name="action" value="delete" class="btn btn-outline-secondary">🗑️ Delete</button>{% endif %}
+          <div class="ms-auto d-flex align-items-center">
+            {% if created %}<span class="text-muted small me-3">Created <span id="created">{{created}}</span></span>{% endif %}
+            <button id="save" type="submit" class="btn btn-primary" disabled>Save</button>
+          </div>
+        </div>
       </form>
+      {% if id %}<form id="delete" method="post" action="/update_link"><input type="hidden" name="id" value="{{id}}"></form>{% endif %}
     </div>
     <script>
       const content = document.getElementById("content");
@@ -29,6 +36,8 @@
         if (navigator.clipboard) navigator.clipboard.writeText(content.value).then(() => copied.classList.remove("d-none"));
         else { content.select(); document.execCommand("copy"); copied.classList.remove("d-none"); }
       });
+      const created = document.getElementById("created");
+      if (created) created.textContent = new Date(created.textContent.replace(" ", "T") + "Z").toLocaleDateString(undefined, {year: "numeric", month: "short", day: "numeric"});
       const saved = content.value;
       content.addEventListener("input", () => save.disabled = content.value === saved);
       content.form.addEventListener("submit", () => save.disabled = true);

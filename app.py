@@ -41,19 +41,23 @@ def catch_all(path):
 @app.route("/note/<name>", methods=["GET", "POST"])
 def note(name):
     if request.method == "POST":
-        if db.get_url_from_name(name) is None:
+        if db.get_link(name) is None:
             db.create_url(name, f"/note/{name}", description="🟨")
         db.set_note(name, request.form.get("content", ""))
-    existing_url = db.get_url_from_name(name)
-    conflict = existing_url is not None and existing_url != f"/note/{name}"
+    link = db.get_link(name)
     return render_template(
-        "note.html", domain=DOMAIN, name=name, content=db.get_note(name) or "", conflict=conflict
+        "note.html", domain=DOMAIN, name=name,
+        content=json.loads(link["metadata"] or "{}").get("note", "") if link else "",
+        conflict=link is not None and link["url"] != f"/note/{name}",
+        id=link["id"] if link else None,
+        created=link["created_date"] if link else None,
     )
 
 
-@app.route("/newnote")
-def newnote():
-    return redirect("/note")
+@app.route("/newnote", defaults={"name": ""})
+@app.route("/newnote/<name>")
+def newnote(name):
+    return redirect(f"/note/{name}" if name else "/note")
 
 
 @app.route("/favicon.ico", methods=["GET"])
