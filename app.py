@@ -53,9 +53,10 @@ def note(name):
     )
 
 
-@app.route("/newnote")
-def newnote():
-    return redirect("/note")
+@app.route("/newnote", defaults={"name": ""})
+@app.route("/newnote/<name>")
+def newnote(name):
+    return redirect(f"/note/{name}" if name else "/note")
 
 
 @app.route("/favicon.ico", methods=["GET"])
