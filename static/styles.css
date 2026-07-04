@@ -1,5 +1,5 @@
 body {background-color: #ddd;}
-.container {padding: 30px; margin: 60px; background-color: #FAFAFA; border-radius: 10px}
+.container {padding: 30px; margin: 60px auto; background-color: #FAFAFA; border-radius: 10px}
 .nopad {padding: 0px}
 .gear {margin-top: -10px; margin-right: 3px; float: right; opacity: 0.6; transition: opacity .2s ease-out}
 .gear:hover {opacity: 1.0}
@@ -20,6 +20,7 @@ body {background-color: #ddd;}
 .url-cell:hover .edit-icon {opacity: 0.6}
 
 @media (max-width: 768px) {
+  .container {margin: 12px; padding: 16px; width: auto;}
   .url-cell {
     max-width: 150px;
   }
