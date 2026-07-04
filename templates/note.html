@@ -25,7 +25,10 @@
       const content = document.getElementById("content");
       const save = document.getElementById("save");
       const copied = document.getElementById("copied");
-      document.getElementById("copy").addEventListener("click", () => navigator.clipboard.writeText(content.value).then(() => copied.classList.remove("d-none")));
+      document.getElementById("copy").addEventListener("click", () => {
+        if (navigator.clipboard) navigator.clipboard.writeText(content.value).then(() => copied.classList.remove("d-none"));
+        else { content.select(); document.execCommand("copy"); copied.classList.remove("d-none"); }
+      });
       const saved = content.value;
       content.addEventListener("input", () => save.disabled = content.value === saved);
       content.form.addEventListener("submit", () => save.disabled = true);
