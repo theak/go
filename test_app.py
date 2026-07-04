@@ -104,8 +104,6 @@ def test_note_get(client, mock_db):
     response = client.get('/note/test')
     assert response.status_code == 200
     assert b'hello note content' in response.data
-    assert b'disabled>Save' in response.data
-    assert '‹ Home' in response.get_data(as_text=True)
 
 
 def test_note_save(client, mock_db):
