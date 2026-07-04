@@ -44,8 +44,10 @@ def note(name):
         if db.get_url_from_name(name) is None:
             db.create_url(name, f"/note/{name}", description="🟨")
         db.set_note(name, request.form.get("content", ""))
+    existing_url = db.get_url_from_name(name)
+    conflict = existing_url is not None and existing_url != f"/note/{name}"
     return render_template(
-        "note.html", domain=DOMAIN, name=name, content=db.get_note(name) or ""
+        "note.html", domain=DOMAIN, name=name, content=db.get_note(name) or "", conflict=conflict
     )
 
 

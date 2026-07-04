@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
+    {% if conflict %}<div class="alert alert-warning">{{domain}}/{{name}} already exists. Access this note at {{domain}}/note/{{name}} or pick a different name.</div>{% endif %}
+    <div id="copied" class="alert alert-success d-none">Note contents copied to clipboard</div>
     <div class="container">
       <div><a href="/">‹ Home</a></div><br/>
-      <h5 class="pb-2">{{domain}}/{{name}}</h5>
+      <h5 class="pb-2 d-flex justify-content-between align-items-center">
+        {{domain}}/{{name}}
+        <button id="copy" type="button" class="btn btn-outline-secondary btn-sm">📋 Copy</button>
+      </h5>
       <form method="post" action="/note/{{name}}">
         <textarea id="content" name="content" class="form-control mb-2" style="font-family: monospace" rows="20">{{content}}</textarea>
         <div class="text-end"><button id="save" type="submit" class="btn btn-primary" disabled>Save</button></div>
@@ -19,6 +24,8 @@
     <script>
       const content = document.getElementById("content");
       const save = document.getElementById("save");
+      const copied = document.getElementById("copied");
+      document.getElementById("copy").addEventListener("click", () => navigator.clipboard.writeText(content.value).then(() => copied.classList.remove("d-none")));
       const saved = content.value;
       content.addEventListener("input", () => save.disabled = content.value === saved);
       content.form.addEventListener("submit", () => save.disabled = true);
