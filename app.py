@@ -50,6 +50,7 @@ def note(name):
         content=json.loads(link["metadata"] or "{}").get("note", "") if link else "",
         conflict=link is not None and link["url"] != f"/note/{name}",
         id=link["id"] if link else None,
+        created=link["created_date"] if link else None,
     )
 
 
