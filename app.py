@@ -38,6 +38,22 @@ def catch_all(path):
         return redirect(url)
 
 
+@app.route("/note/<name>", methods=["GET", "POST"])
+def note(name):
+    if request.method == "POST":
+        if db.get_url_from_name(name) is None:
+            db.create_url(name, f"/note/{name}", description="🟨")
+        db.set_note(name, request.form.get("content", ""))
+    return render_template(
+        "note.html", domain=DOMAIN, name=name, content=db.get_note(name) or ""
+    )
+
+
+@app.route("/newnote")
+def newnote():
+    return redirect("/note")
+
+
 @app.route("/favicon.ico", methods=["GET"])
 def favicon():
     return send_file("favicon.ico")
@@ -85,12 +101,15 @@ def submit_link():
     name = request.form.get("name")
     url = request.form.get("url")
 
-    if not name or not url:
-        return root("Error: Both name and URL are required."), 400
+    if not name:
+        return root("Error: Name is required."), 400
     if db.get_url_from_name(name):
         return root(
             f"Error: {DOMAIN}/{name} already exists. If you're trying to modify it, delete it first."
         ), 400
+    if not url:
+        db.create_url(name, f"/note/{name}", description="🟨")
+        return redirect(f"/note/{name}")
     if not _is_valid_url(url):
         return root("Error: Invalid URL"), 400
 
