@@ -38,23 +38,30 @@ def rename_link(id: int, newName: str):
 def update_url(id: int, new_url: str):
     modify_db("UPDATE link SET url = ? WHERE id = ?", [new_url, id])
 
-def create_url(name: str, url: str):
-    modify_db("INSERT INTO link (name, url) VALUES (?, ?)", (name, url))
+def create_url(name: str, url: str, description: str = None):
+    modify_db("INSERT INTO link (name, url, description) VALUES (?, ?, ?)", (name, url, description))
+
+def get_note(name: str) -> str | None:
+    row = query_db("SELECT metadata FROM link WHERE name = ?", [name], one=True)
+    return None if row is None else json.loads(row["metadata"] or "{}").get("note", "")
+
+def set_note(name: str, content: str):
+    modify_db("UPDATE link SET metadata = json_set(metadata, '$.note', ?) WHERE name = ?", [content, name])
 
 def export_links_json() -> str:
-    links = query_db("SELECT name, url, description FROM link")
+    links = query_db("SELECT name, url, description, metadata FROM link")
     return json.dumps({
         "version": 1,
-        "links": [{"name": l["name"], "url": l["url"], "description": l["description"]} for l in links]
+        "links": [{"name": l["name"], "url": l["url"], "description": l["description"], "metadata": l["metadata"]} for l in links]
     }, indent=2)
 
 def import_links_json(json_str: str) -> int:
     data = json.loads(json_str)
     for link in data.get("links", []):
         modify_db("""
-            INSERT INTO link (name, url, description) VALUES (?, ?, ?)
-            ON CONFLICT(name) DO UPDATE SET url=excluded.url, description=excluded.description
-        """, (link["name"], link["url"], link.get("description")))
+            INSERT INTO link (name, url, description, metadata) VALUES (?, ?, ?, ?)
+            ON CONFLICT(name) DO UPDATE SET url=excluded.url, description=excluded.description, metadata=excluded.metadata
+        """, (link["name"], link["url"], link.get("description"), link.get("metadata") or '{}'))
     return len(data.get("links", []))
 
 def close_connection(exception):

@@ -1,7 +1,7 @@
 import pytest
 import tempfile
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import ANY, patch, MagicMock
 from app import app
 
 
@@ -78,13 +78,43 @@ def test_submit_link_success(client, mock_db):
     mock_db.create_url.assert_called_once_with('test', 'https://example.com')
 
 
-def test_submit_link_missing_data(client, mock_db):
-    """Test POST /submit_link with missing name or URL"""
+def test_submit_link_missing_name(client, mock_db):
+    """Test POST /submit_link with missing name"""
     mock_db.get_all_links.return_value = []
-    
-    response = client.post('/submit_link', data={'name': 'test'})
+
+    response = client.post('/submit_link', data={'url': 'https://example.com'})
     assert response.status_code == 400
-    assert b'Both name and URL are required' in response.data
+    assert b'Name is required' in response.data
+
+
+def test_submit_link_blank_url_creates_note(client, mock_db):
+    """Test POST /submit_link with blank URL creates a note link"""
+    mock_db.get_url_from_name.return_value = None
+
+    response = client.post('/submit_link', data={'name': 'test', 'url': ''})
+    assert response.status_code == 302
+    assert response.location == '/note/test'
+    mock_db.create_url.assert_called_once_with('test', '/note/test', description=ANY)
+
+
+def test_note_get(client, mock_db):
+    """Test GET /note/<name> renders editor with note content"""
+    mock_db.get_note.return_value = 'hello note content'
+
+    response = client.get('/note/test')
+    assert response.status_code == 200
+    assert b'hello note content' in response.data
+
+
+def test_note_save(client, mock_db):
+    """Test POST /note/<name> creates the link row and saves content"""
+    mock_db.get_url_from_name.return_value = None
+    mock_db.get_note.return_value = 'new content'
+
+    response = client.post('/note/test', data={'content': 'new content'})
+    assert response.status_code == 200
+    mock_db.create_url.assert_called_once_with('test', '/note/test', description=ANY)
+    mock_db.set_note.assert_called_once_with('test', 'new content')
 
 
 def test_submit_link_duplicate_name(client, mock_db):
