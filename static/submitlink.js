@@ -25,3 +25,27 @@ function editUrl(link_id, current_url) {
       .then(() => window.location.href = "/");
   }
 }
+
+function banner(type, msg) {
+  document.getElementById("banner").innerHTML =
+    `<div class="alert alert-${type}">${msg}</div>`;
+}
+
+function deleteLink(btn, link_id, link_name) {
+  btn.textContent = "…";
+  btn.disabled = true;
+  const formData = new FormData();
+  formData.append("id", link_id);
+  formData.append("action", "delete");
+  fetch("/update_link", { method: "POST", body: formData })
+    .then((r) => {
+      if (!r.ok) throw new Error();
+      banner("success", link_name + " deleted");
+      btn.closest("tr").remove();
+    })
+    .catch(() => {
+      banner("danger", "Failed to delete " + link_name);
+      btn.textContent = "🗑️";
+      btn.disabled = false;
+    });
+}
