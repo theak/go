@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
-    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-    {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
+    <div id="banner">
+      {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+      {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
+    </div>
     <div class="container">
       <h5 class="pb-2">Create a new {{domain}} link
         <a class="link-secondary gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
@@ -63,10 +65,8 @@
                   <span class="edit-icon">✎</span>
                 </td>
                 <td>
-                  <form method="post" action="/update_link" class="inline">
-                    <input type="hidden" name="id" value="{{ link.id }}" />
-                    <button type="submit" class="btn nopad" name="action" value="delete">🗑️</button>
-                  </form>
+                  <button type="button" class="btn nopad"
+                          onclick="deleteLink(this, {{ link.id }}, '{{domain}}/{{ link.name }}')">🗑️</button>
                 </td>
               </tr>
               {% endfor %}
