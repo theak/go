@@ -45,9 +45,8 @@ def get_link(name: str):
     return query_db("SELECT * FROM link WHERE name = ?", [name], one=True)
 
 def set_note(name: str, content: str, markdown: bool = False):
-    modify_db(
-        "UPDATE link SET metadata = json_set(metadata, '$.note', ?, '$.markdown', json(?)) WHERE name = ?",
-        [content, "true" if markdown else "false", name])
+    modify_db("UPDATE link SET metadata = json_set(metadata, '$.note', ?, '$.markdown', ?) WHERE name = ?",
+              [content, markdown, name])
 
 def export_links_json() -> str:
     links = query_db("SELECT name, url, description, metadata FROM link")
