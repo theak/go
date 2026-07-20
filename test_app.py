@@ -113,7 +113,7 @@ def test_note_save(client, mock_db):
     response = client.post('/note/test', data={'content': 'new content'})
     assert response.status_code == 200
     mock_db.create_url.assert_called_once_with('test', '/note/test', description=ANY)
-    mock_db.set_note.assert_called_once_with('test', 'new content')
+    mock_db.set_note.assert_called_once_with('test', 'new content', False)
 
 
 def test_submit_link_duplicate_name(client, mock_db):

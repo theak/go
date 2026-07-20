@@ -19,6 +19,11 @@ body {background-color: #ddd;}
 .url-cell .edit-icon {opacity: 0; margin-left: 8px}
 .url-cell:hover .edit-icon {opacity: 0.6}
 
+#rendered {padding: 2.25rem; line-height: 1.6;}
+#rendered > * {margin-bottom: 1rem;}
+#rendered > :last-child {margin-bottom: 0;}
+#rendered img {max-width: 100%;}
+
 @media (max-width: 768px) {
   .container {margin: 12px; padding: 16px; width: auto;}
   .url-cell {
