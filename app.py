@@ -43,11 +43,13 @@ def note(name):
     if request.method == "POST":
         if db.get_link(name) is None:
             db.create_url(name, f"/note/{name}", description="🟨")
-        db.set_note(name, request.form.get("content", ""))
+        db.set_note(name, request.form.get("content", ""), request.form.get("markdown") is not None)
     link = db.get_link(name)
+    meta = json.loads(link["metadata"] or "{}") if link else {}
     return render_template(
         "note.html", domain=DOMAIN, name=name,
-        content=json.loads(link["metadata"] or "{}").get("note", "") if link else "",
+        content=meta.get("note", ""),
+        markdown=meta.get("markdown", False),
         conflict=link is not None and link["url"] != f"/note/{name}",
         id=link["id"] if link else None,
         created=link["created_date"] if link else None,
