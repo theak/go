@@ -116,6 +116,45 @@ def test_note_save(client, mock_db):
     mock_db.set_note.assert_called_once_with('test', 'new content', False)
 
 
+def test_upload_image_success(client, mock_db):
+    """Test POST /note/upload_image stores the image and returns its URL"""
+    import io
+    response = client.post('/note/upload_image', data={
+        'image': (io.BytesIO(b'\x89PNG\r\n\x1a\n'), 'shot.png', 'image/png')
+    }, content_type='multipart/form-data')
+    assert response.status_code == 200
+    assert response.json['url'].startswith('/note/img/')
+    mock_db.save_image.assert_called_once()
+
+
+def test_upload_image_rejects_non_image(client, mock_db):
+    """Test POST /note/upload_image with a non-image file → 400"""
+    import io
+    response = client.post('/note/upload_image', data={
+        'image': (io.BytesIO(b'not an image'), 'note.txt', 'text/plain')
+    }, content_type='multipart/form-data')
+    assert response.status_code == 400
+    mock_db.save_image.assert_not_called()
+
+
+def test_image_serve_found(client, mock_db):
+    """Test GET /note/img/<id> streams the stored image with its content type"""
+    mock_db.get_image.return_value = {'content_type': 'image/png', 'data': b'\x89PNG\r\n\x1a\n'}
+
+    response = client.get('/note/img/abc123')
+    assert response.status_code == 200
+    assert response.content_type == 'image/png'
+    assert response.data == b'\x89PNG\r\n\x1a\n'
+
+
+def test_image_serve_not_found(client, mock_db):
+    """Test GET /note/img/<id> when the image doesn't exist → 404"""
+    mock_db.get_image.return_value = None
+
+    response = client.get('/note/img/missing')
+    assert response.status_code == 404
+
+
 def test_submit_link_duplicate_name(client, mock_db):
     """Test POST /submit_link with existing name"""
     mock_db.get_url_from_name.return_value = 'https://existing.com'

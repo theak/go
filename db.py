@@ -48,6 +48,13 @@ def set_note(name: str, content: str, markdown: bool = False):
     modify_db("UPDATE link SET metadata = json_set(metadata, '$.note', ?, '$.markdown', ?) WHERE name = ?",
               [content, markdown, name])
 
+def save_image(id: str, content_type: str, data: bytes):
+    modify_db("INSERT INTO image (id, content_type, data) VALUES (?, ?, ?)",
+              (id, content_type, data))
+
+def get_image(id: str):
+    return query_db("SELECT content_type, data FROM image WHERE id = ?", [id], one=True)
+
 def export_links_json() -> str:
     links = query_db("SELECT name, url, description, metadata FROM link")
     return json.dumps({

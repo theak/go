@@ -66,6 +66,29 @@
         markdown.checked = false; renderView(); updateSave(); content.focus();
       });
       renderView();
+      let uploadSeq = 0;
+      function uploadImage(file) {
+        const name = file.name || "image";
+        const token = `![Uploading ${name} #${++uploadSeq}…]()`;
+        content.setRangeText(token, content.selectionStart, content.selectionEnd, "end");
+        updateSave();
+        const body = new FormData();
+        body.append("image", file);
+        fetch("/note/upload_image", { method: "POST", body })
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(({ url }) => { content.value = content.value.replace(token, `![${name}](${url})`); })
+          .catch(() => { content.value = content.value.replace(token, `![upload failed]()`); })
+          .finally(updateSave);
+      }
+      content.addEventListener("paste", (e) => {
+        const files = [...e.clipboardData.items].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile());
+        if (files.length) { e.preventDefault(); files.forEach(uploadImage); }
+      });
+      content.addEventListener("dragover", (e) => e.preventDefault());
+      content.addEventListener("drop", (e) => {
+        const files = [...e.dataTransfer.files].filter(f => f.type.startsWith("image/"));
+        if (files.length) { e.preventDefault(); files.forEach(uploadImage); }
+      });
       content.form.addEventListener("submit", () => save.disabled = true);
       window.addEventListener("beforeunload", (e) => {
         if (!save.disabled) { e.preventDefault(); e.returnValue = ""; }
