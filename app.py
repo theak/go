@@ -90,7 +90,14 @@ def favicon():
 
 @app.route("/settings", methods=["GET"])
 def settings():
-    return render_template("settings.html", domain=DOMAIN)
+    return render_template("settings.html", domain=DOMAIN,
+                           images=db.count_images(), cleaned=request.args.get("cleaned"))
+
+
+@app.route("/cleanup_images", methods=["POST"])
+def cleanup_images():
+    count = db.delete_unused_images()
+    return redirect(f"/settings?cleaned={count}")
 
 
 @app.route("/backup", methods=["GET"])

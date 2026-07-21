@@ -263,7 +263,17 @@ def test_restore_route_invalid_file(client, mock_db):
 def test_reset_route(client, mock_db):
     """Test POST /reset clears database"""
     mock_db.reset_db.return_value = None
-    
+
     response = client.post('/reset')
     assert response.status_code == 302
     mock_db.reset_db.assert_called_once_with(app)
+
+
+def test_cleanup_images_route(client, mock_db):
+    """Test POST /cleanup_images deletes unused images and redirects with count"""
+    mock_db.delete_unused_images.return_value = 3
+
+    response = client.post('/cleanup_images')
+    assert response.status_code == 302
+    assert response.location == '/settings?cleaned=3'
+    mock_db.delete_unused_images.assert_called_once()

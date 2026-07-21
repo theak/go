@@ -55,6 +55,17 @@ def save_image(id: str, content_type: str, data: bytes):
 def get_image(id: str):
     return query_db("SELECT content_type, data FROM image WHERE id = ?", [id], one=True)
 
+def count_images() -> int:
+    return query_db("SELECT count(*) AS c FROM image", one=True)["c"]
+
+def delete_unused_images() -> int:
+    notes = query_db("SELECT json_extract(metadata, '$.note') AS note FROM link")
+    text = "\n".join(n["note"] or "" for n in notes)
+    unused = [img["id"] for img in query_db("SELECT id FROM image") if img["id"] not in text]
+    if unused:
+        modify_db(f"DELETE FROM image WHERE id IN ({','.join('?' * len(unused))})", unused)
+    return len(unused)
+
 def export_links_json() -> str:
     links = query_db("SELECT name, url, description, metadata FROM link")
     return json.dumps({

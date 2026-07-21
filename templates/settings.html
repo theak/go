@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
+    {% if cleaned is not none %}<div class="alert alert-success">Removed {{ cleaned }} unused image{{ 's' if cleaned != '1' else '' }}.</div>{% endif %}
     <div class="container">
       <div><a href="/">‹ Home</a></div><br/>
       <h5>Server settings</h5>
@@ -48,6 +49,13 @@
             <button type="submit" class="btn btn-outline-danger">💣 Reset everything</button>
           </form>
         </div>
+        {% if images %}
+        <div class="col-auto">
+          <form method="post" action="/cleanup_images" onsubmit="return confirm('Delete all images not referenced by any note?');">
+            <button type="submit" class="btn btn-outline-warning">🧹 Clean up unused images</button>
+          </form>
+        </div>
+        {% endif %}
       </div>
     </div>
     <div class="container">
