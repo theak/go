@@ -1,14 +1,17 @@
 import json
 import os
+import secrets
 import sys
+from io import BytesIO
 from urllib.parse import urlparse
 
-from flask import Flask, Response, redirect, render_template, request, send_file
+from flask import Flask, Response, abort, redirect, render_template, request, send_file
 
 import db
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False  # Disable strict slashes
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB upload cap
 DOMAIN = "go"
 
 ALLOWED_EXTENSIONS = {"json"}
@@ -60,6 +63,24 @@ def note(name):
 @app.route("/newnote/<name>")
 def newnote(name):
     return redirect(f"/note/{name}" if name else "/note")
+
+
+@app.route("/note/upload_image", methods=["POST"])
+def upload_image():
+    file = request.files.get("image")
+    if file is None or not file.mimetype.startswith("image/"):
+        return "Invalid image", 400
+    img_id = secrets.token_urlsafe(8)
+    db.save_image(img_id, file.mimetype, file.read())
+    return {"url": f"/note/img/{img_id}"}
+
+
+@app.route("/note/img/<img_id>")
+def image(img_id):
+    img = db.get_image(img_id)
+    if img is None:
+        abort(404)
+    return send_file(BytesIO(img["data"]), mimetype=img["content_type"], max_age=31536000)
 
 
 @app.route("/favicon.ico", methods=["GET"])

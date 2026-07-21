@@ -7,6 +7,14 @@ CREATE TABLE IF NOT EXISTS link (
     metadata JSON DEFAULT '{}'
 );
 
+CREATE TABLE IF NOT EXISTS image (
+    id TEXT PRIMARY KEY,
+    content_type TEXT NOT NULL,
+    data BLOB NOT NULL,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    metadata JSON DEFAULT '{}'
+);
+
 CREATE TABLE IF NOT EXISTS name_values (
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
