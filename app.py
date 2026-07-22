@@ -5,7 +5,7 @@ import sys
 from io import BytesIO
 from urllib.parse import urlparse
 
-from flask import Flask, Response, abort, redirect, render_template, request, send_file
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, send_file
 
 import db
 
@@ -158,11 +158,22 @@ def update_link():
     id = request.form.get("id")
     action = request.form.get("action")
 
+    if action == "restore":
+        db.restore_link(
+            request.form.get("name"),
+            request.form.get("url"),
+            request.form.get("description"),  # None -> stays NULL
+            request.form.get("metadata"),
+        )
+        return redirect("/")
+
     if not id or not id.isnumeric():
         return root("Error: Invalid ID."), 400
 
     if action == "delete":
+        link = db.get_link_by_id(int(id))
         db.delete_link(int(id))
+        return jsonify(dict(link)) if link else ("Not found", 404)
 
     if action == "rename":
         db.rename_link(int(id), request.form.get("newName"))

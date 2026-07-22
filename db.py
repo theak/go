@@ -41,6 +41,15 @@ def update_url(id: int, new_url: str):
 def create_url(name: str, url: str, description: str = None):
     modify_db("INSERT INTO link (name, url, description) VALUES (?, ?, ?)", (name, url, description))
 
+def get_link_by_id(id: int):
+    return query_db("SELECT * FROM link WHERE id = ?", [id], one=True)
+
+def restore_link(name: str, url: str, description: str, metadata: str):
+    modify_db("""INSERT INTO link (name, url, description, metadata) VALUES (?, ?, ?, ?)
+                 ON CONFLICT(name) DO UPDATE SET url=excluded.url,
+                   description=excluded.description, metadata=excluded.metadata""",
+              (name, url, description, metadata or '{}'))
+
 def get_link(name: str):
     return query_db("SELECT * FROM link WHERE name = ?", [name], one=True)
 

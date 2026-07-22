@@ -182,15 +182,48 @@ def test_submit_link_invalid_url(client, mock_db):
 
 
 def test_update_link_delete(client, mock_db):
-    """Test POST /update_link with delete action"""
+    """Test POST /update_link with delete action returns the deleted link as JSON (for undo)"""
+    mock_db.get_link_by_id.return_value = {
+        'id': 1, 'name': 'test', 'url': 'https://example.com',
+        'description': None, 'metadata': '{}'
+    }
     mock_db.delete_link.return_value = None
-    
+
     response = client.post('/update_link', data={
         'id': '1',
         'action': 'delete'
     })
-    assert response.status_code == 302
+    assert response.status_code == 200
+    assert response.json['name'] == 'test'
+    assert response.json['url'] == 'https://example.com'
+    mock_db.get_link_by_id.assert_called_once_with(1)
     mock_db.delete_link.assert_called_once_with(1)
+
+
+def test_update_link_delete_missing(client, mock_db):
+    """Test POST /update_link delete of a nonexistent id → 404"""
+    mock_db.get_link_by_id.return_value = None
+
+    response = client.post('/update_link', data={
+        'id': '999',
+        'action': 'delete'
+    })
+    assert response.status_code == 404
+
+
+def test_update_link_restore(client, mock_db):
+    """Test POST /update_link with restore action re-inserts the full link (undo)"""
+    response = client.post('/update_link', data={
+        'action': 'restore',
+        'name': 'test',
+        'url': 'https://example.com',
+        'description': 'My Link',
+        'metadata': '{"note": "hello"}'
+    })
+    assert response.status_code == 302
+    mock_db.restore_link.assert_called_once_with(
+        'test', 'https://example.com', 'My Link', '{"note": "hello"}'
+    )
 
 
 def test_update_link_rename(client, mock_db):

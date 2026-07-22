@@ -31,6 +31,8 @@ function banner(type, msg) {
     `<div class="alert alert-${type}">${msg}</div>`;
 }
 
+let lastDeleted = null;
+
 function deleteLink(btn, link_id, link_name) {
   btn.textContent = "…";
   btn.disabled = true;
@@ -40,7 +42,13 @@ function deleteLink(btn, link_id, link_name) {
   fetch("/update_link", { method: "POST", body: formData })
     .then((r) => {
       if (!r.ok) throw new Error();
-      banner("success", link_name + " deleted");
+      return r.json();
+    })
+    .then((link) => {
+      lastDeleted = link;
+      document.getElementById("banner").innerHTML =
+        `<div class="alert alert-success">${link_name} deleted ` +
+        `<a href="#" onclick="undoDelete(event)">Undo</a></div>`;
       btn.closest("tr").remove();
     })
     .catch(() => {
@@ -48,4 +56,21 @@ function deleteLink(btn, link_id, link_name) {
       btn.textContent = "🗑️";
       btn.disabled = false;
     });
+}
+
+function undoDelete(e) {
+  if (e) e.preventDefault();
+  if (!lastDeleted) return;
+  const fd = new FormData();
+  fd.append("action", "restore");
+  fd.append("name", lastDeleted.name);
+  fd.append("url", lastDeleted.url);
+  if (lastDeleted.description != null) fd.append("description", lastDeleted.description);
+  fd.append("metadata", lastDeleted.metadata ?? "{}");
+  fetch("/update_link", { method: "POST", body: fd })
+    .then((r) => {
+      if (!r.ok) throw new Error();
+      window.location.href = "/";
+    })
+    .catch(() => banner("danger", "Failed to restore " + lastDeleted.name));
 }
