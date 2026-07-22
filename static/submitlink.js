@@ -48,7 +48,7 @@ function deleteLink(btn, link_id, link_name) {
       lastDeleted = link;
       document.getElementById("banner").innerHTML =
         `<div class="alert alert-success">${link_name} deleted ` +
-        `<a href="#" onclick="undoDelete(event)">Undo</a></div>`;
+        `<a href="#" class="link-secondary float-end" onclick="undoDelete(event)">Undo</a></div>`;
       btn.closest("tr").remove();
     })
     .catch(() => {
