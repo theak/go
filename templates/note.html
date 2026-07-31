@@ -90,6 +90,12 @@
         if (files.length) { e.preventDefault(); files.forEach(uploadImage); }
       });
       content.form.addEventListener("submit", () => save.disabled = true);
+      document.addEventListener("keydown", (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+          e.preventDefault();
+          if (!save.disabled) content.form.requestSubmit();
+        }
+      });
       window.addEventListener("beforeunload", (e) => {
         if (!save.disabled) { e.preventDefault(); e.returnValue = ""; }
       });
