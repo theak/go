@@ -107,11 +107,12 @@ def test_note_get(client, mock_db):
 
 
 def test_note_save(client, mock_db):
-    """Test POST /note/<name> creates the link row and saves content"""
+    """Test POST /note/<name> creates the link row and saves content, then redirects"""
     mock_db.get_link.return_value = None
 
     response = client.post('/note/test', data={'content': 'new content'})
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.location == '/note/test'
     mock_db.create_url.assert_called_once_with('test', '/note/test', description=ANY)
     mock_db.set_note.assert_called_once_with('test', 'new content', False)
 

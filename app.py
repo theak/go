@@ -47,6 +47,7 @@ def note(name):
         if db.get_link(name) is None:
             db.create_url(name, f"/note/{name}", description="🟨")
         db.set_note(name, request.form.get("content", ""), request.form.get("markdown") is not None)
+        return redirect(f"/note/{name}")
     link = db.get_link(name)
     meta = json.loads(link["metadata"] or "{}") if link else {}
     return render_template(
