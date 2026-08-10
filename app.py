@@ -23,7 +23,8 @@ ALLOWED_EXTENSIONS = {"json"}
 def root(error: str | None = None, newlink: dict | None = None):
     links = db.get_all_links()
     return render_template(
-        "submitlink.html", domain=DOMAIN, links=links, error=error, newlink=newlink
+        "submitlink.html", domain=DOMAIN, links=links, error=error, newlink=newlink,
+        deleted=request.args.get("deleted"),
     )
 
 

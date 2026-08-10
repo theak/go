@@ -11,6 +11,7 @@
     <div id="banner">
       {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
       {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
+      {% if deleted %}<div class="alert alert-success">Deleted {{domain}}/{{ deleted }}</div>{% endif %}
     </div>
     <div class="container">
       <h5 class="pb-2">Create a new {{domain}} link
