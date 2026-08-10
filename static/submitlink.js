@@ -1,3 +1,5 @@
+if (new URLSearchParams(location.search).has("deleted")) history.replaceState({}, "", "/");
+
 function expand(td) {
   td.innerHTML = td.title;
 }

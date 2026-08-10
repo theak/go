@@ -99,6 +99,16 @@
       window.addEventListener("beforeunload", (e) => {
         if (!save.disabled) { e.preventDefault(); e.returnValue = ""; }
       });
+      const deleteForm = document.getElementById("delete");
+      if (deleteForm) deleteForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        save.disabled = true;   // deleting: don't warn about unsaved changes
+        const body = new FormData();
+        body.append("id", deleteForm.querySelector("[name=id]").value);
+        body.append("action", "delete");
+        fetch("/update_link", { method: "POST", body })
+          .then(() => window.location.href = "/?deleted=" + encodeURIComponent({{ name|tojson }}));
+      });
     </script>
   </body>
 </html>
