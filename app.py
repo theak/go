@@ -220,4 +220,4 @@ def _allowed_file(filename):
 if __name__ == "__main__":
     db.init_db(app)
     if sys.argv[-1] != "init_db":
-        app.run(debug=True)
+        app.run(debug=True, port=int(os.environ.get("PORT", 5000)))
