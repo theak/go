@@ -186,6 +186,16 @@ def update_link():
     return redirect("/")
 
 
+@app.template_filter("icon_label")
+def icon_label(link):
+    """Split a description like "📷 Zoneminder" into (icon, label); the icon falls back to the link's initial."""
+    desc = (dict(link).get("description") or "").strip()
+    head, _, rest = desc.partition(" ")
+    if head and not head[0].isalnum():
+        return head, rest.strip()
+    return link["name"][:1].upper(), desc
+
+
 """ MISC ROUTES """
 
 

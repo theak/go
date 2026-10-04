@@ -36,6 +36,7 @@ function banner(type, msg) {
 let lastDeleted = null;
 
 function deleteLink(btn, link_id, link_name) {
+  const icon = btn.innerHTML;
   btn.textContent = "…";
   btn.disabled = true;
   const formData = new FormData();
@@ -58,7 +59,7 @@ function deleteLink(btn, link_id, link_name) {
     })
     .catch(() => {
       banner("danger", "Failed to delete " + link_name);
-      btn.textContent = "🗑️";
+      btn.innerHTML = icon;
       btn.disabled = false;
     });
 }
@@ -83,8 +84,8 @@ function undoDelete(e) {
 /* SEARCH */
 
 const q = document.getElementById("q");
-const recentEl = document.getElementById("recent");
 const results = document.getElementById("results");
+const url = document.getElementById("url");
 
 function filter() {
   const s = q.value.trim().toLowerCase();
@@ -100,11 +101,10 @@ function filter() {
   for (const a of items) a.hidden = !hits.includes(a);
   results.prepend(...hits);
   const exact = hits.length > 0 && rank(hits[0]) === 0;
-  recentEl.hidden = !!s;
+  document.getElementById("clear").hidden = !s;
   document.getElementById("create").hidden = !s || exact;
   document.getElementById("create-name").value = q.value.trim();
   document.getElementById("create-label").textContent = q.value.trim();
-  document.getElementById("create-note").href = "/note/" + encodeURIComponent(q.value.trim());
 }
 
 q.addEventListener("input", filter);
@@ -115,41 +115,59 @@ q.addEventListener("keydown", (e) => {
     track(first.dataset.go);
     location.href = first.href;
   } else {
-    document.getElementById("url").focus();
+    url.focus();
   }
+});
+document.getElementById("clear").addEventListener("click", () => {
+  q.value = "";
+  filter();
+  q.focus();
+});
+// A blank URL creates a note, so the button says which one you'll get.
+url.addEventListener("input", () => {
+  document.getElementById("create-btn").textContent = url.value ? "Create link" : "Create note";
 });
 if (matchMedia("(pointer: fine)").matches) q.focus();
 filter();
 
-/* RECENT LINKS (stored per-device in localStorage) */
+/* RECENT LINKS (stored per-device in localStorage as [{name, t}]) */
+
+const recentEl = document.getElementById("recent");
 
 function loadRecent() {
-  try { return JSON.parse(localStorage.getItem("recent")) || []; } catch { return []; }
+  try { return JSON.parse(localStorage.getItem("recent")).filter((r) => r.name); } catch { return []; }
 }
 
-function saveRecent(names) {
-  try { localStorage.setItem("recent", JSON.stringify(names.slice(0, 5))); } catch {}
+function saveRecent(list) {
+  try { localStorage.setItem("recent", JSON.stringify(list.slice(0, 5))); } catch {}
   renderRecent();
 }
 
 function track(name) {
-  saveRecent([name, ...loadRecent().filter((n) => n !== name)]);
+  saveRecent([{ name, t: Date.now() }, ...loadRecent().filter((r) => r.name !== name)]);
+}
+
+function ago(t) {
+  const m = Math.round((Date.now() - t) / 60000);
+  return m < 1 ? "just now" : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`;
 }
 
 function renderRecent() {
-  recentEl.replaceChildren(...loadRecent().map((name) => {
+  const tiles = loadRecent().map(({ name, t }) => {
     const link = document.querySelector(`#results a[data-go="${CSS.escape(name)}"]`);
-    if (!link) return "";
+    if (!link) return null;
     const a = document.createElement("a");
     a.href = link.href;
     a.target = "_blank";
     a.dataset.go = name;
-    a.innerHTML = `<span></span><small></small>`;
-    // Use the leading emoji of the description as the icon.
-    a.firstChild.textContent = link.dataset.desc.match(/^\P{L}*/u)[0].trim() || "🔗";
-    a.lastChild.textContent = link.querySelector("b").textContent;
+    a.innerHTML = `<span class="ago"></span><span class="arrow">↗</span><span class="go"><span class="muted"></span><b></b></span>`;
+    a.querySelector(".ago").textContent = ago(t);
+    a.querySelector(".muted").textContent = link.querySelector(".name").textContent.slice(0, -name.length);
+    a.querySelector("b").textContent = name;
     return a;
-  }));
+  }).filter(Boolean);
+  recentEl.replaceChildren(...tiles);
+  document.getElementById("recent-section").hidden = !tiles.length;
 }
 
 // Long-press a recent link to remove it.
@@ -160,7 +178,7 @@ recentEl.addEventListener("pointerdown", (e) => {
   longPressed = false;
   pressTimer = setTimeout(() => {
     longPressed = true;
-    saveRecent(loadRecent().filter((n) => n !== a.dataset.go));
+    saveRecent(loadRecent().filter((r) => r.name !== a.dataset.go));
   }, 500);
 });
 for (const ev of ["pointerup", "pointerleave", "pointercancel"]) {
