@@ -20,11 +20,11 @@ ALLOWED_EXTENSIONS = {"json"}
 
 
 @app.route("/", methods=["GET"])
-def root(error: str | None = None, newlink: dict | None = None):
+def root(error: str | None = None, newlink: dict | None = None, query: str | None = None):
     links = db.get_all_links()
     return render_template(
         "submitlink.html", domain=DOMAIN, links=links, error=error, newlink=newlink,
-        deleted=request.args.get("deleted"),
+        deleted=request.args.get("deleted"), query=query,
     )
 
 
@@ -35,7 +35,7 @@ def catch_all(path):
     name = split_path[0]
     url = db.get_url_from_name(name)
     if url is None:
-        return render_template("submitlink.html", name=name, domain=DOMAIN)
+        return root(query=name)
     else:
         if len(split_path) > 1:
             url += split_path[1]
@@ -149,7 +149,7 @@ def submit_link():
         db.create_url(name, f"/note/{name}", description="🟨")
         return redirect(f"/note/{name}")
     if not _is_valid_url(url):
-        return root("Error: Invalid URL"), 400
+        return root("Error: Invalid URL", query=name), 400
 
     db.create_url(name, url)
     return root(newlink={"name": name, "url": url})
@@ -186,6 +186,16 @@ def update_link():
     return redirect("/")
 
 
+@app.template_filter("icon_label")
+def icon_label(link):
+    """Split a description like "📷 Zoneminder" into (icon, label); the icon falls back to the link's initial."""
+    desc = (dict(link).get("description") or "").strip()
+    head, _, rest = desc.partition(" ")
+    if head and not head[0].isalnum():
+        return head, rest.strip()
+    return link["name"][:1].upper(), desc
+
+
 """ MISC ROUTES """
 
 
@@ -220,4 +230,4 @@ def _allowed_file(filename):
 if __name__ == "__main__":
     db.init_db(app)
     if sys.argv[-1] != "init_db":
-        app.run(debug=True)
+        app.run(debug=True, port=int(os.environ.get("PORT", 5000)))

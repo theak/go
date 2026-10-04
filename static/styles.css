@@ -1,13 +1,66 @@
-body {background-color: #ddd;}
-.container {padding: 30px; margin: 60px auto; background-color: #FAFAFA; border-radius: 10px}
+body {background-color: #f7f6f3;}
+.container {padding: 30px; margin: 40px auto; background-color: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06)}
 .nopad {padding: 0px}
-.gear {margin-top: -10px; margin-right: 3px; float: right; opacity: 0.6; transition: opacity .2s ease-out}
+.gear {opacity: 0.5; transition: opacity .2s ease-out}
 .gear:hover {opacity: 1.0}
 
 .domain {display: inline; width: 90%;}
 .row {line-height: 2.2; margin-bottom: 20px}
 .pre {background-color: #FFF;}
 #hosts {display: inline}
+
+/* HOME */
+.home {--ink: #2b2722; --muted: #8a847b; --line: #e7e4de; --soft: #f3f1ed; color: var(--ink)}
+.home .muted {color: var(--muted)}
+.page {max-width: 1000px; margin: 0 auto; padding: 24px 24px 64px}
+.label {margin: 28px 0 12px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)}
+.page > .label:first-child {margin-top: 8px}
+.panel {background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.04); overflow: hidden}
+
+.search {display: flex; align-items: center; gap: 4px; margin: 0; padding: 18px 24px; font-size: 2.5rem; cursor: text}
+.search input::placeholder {color: #d5d1ca}
+.search input {flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--ink)}
+.search button {border: 0; background: none; font-size: 2rem; line-height: 1; color: var(--muted)}
+
+#results:not(:has(a:not([hidden]))) {display: none}
+#results {padding: 8px; border-top: 1px solid var(--line)}
+#results a {
+  display: grid; grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1.4fr) auto; align-items: center; gap: 16px;
+  padding: 10px 12px; border-radius: 10px; color: var(--ink); text-decoration: none;
+}
+#results a:hover {background: var(--soft)}
+#results a.selected {background: var(--soft)}
+#results .name {font-size: 1.1rem; font-weight: 500}
+#results .name, #results .url {overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+#results .url {color: var(--muted)}
+
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border-radius: 8px; background: var(--soft); color: var(--muted); font-size: 1rem; flex: none;
+}
+#create {padding: 20px 24px; border-top: 1px solid var(--line); color: var(--muted)}
+#create b {color: var(--ink); font-weight: 500}
+#create .form-control, #create .btn {border-radius: 10px; padding: .6rem 1rem}
+
+#recent {display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); gap: 16px; overflow-x: auto}
+#recent a {
+  display: grid; grid-template-columns: 1fr auto; row-gap: 12px; padding: 16px 20px;
+  background: #fff; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); text-decoration: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+#recent a:hover {border-color: #cfcac2}
+#recent .go {grid-column: 1 / -1; font-size: 1.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+#recent b {font-weight: 500; color: var(--ink)}
+
+#links {--bs-table-bg: transparent}
+#links th {padding: 14px 20px; font-weight: 500; color: var(--muted); background: var(--soft)}
+#links td {padding: 12px 20px; vertical-align: middle; border-color: var(--line)}
+#links tbody tr:last-child td {border-bottom: 0}
+#links .namecell {cursor: pointer; width: 1%; padding-right: 0}
+#links a {text-decoration: none}
+#links .url-cell {color: var(--muted)}
+.trash {border: 0; background: none; color: var(--muted); padding: 4px}
+.trash:hover {color: #c0392b}
 
 .url-cell {
   cursor: pointer;
@@ -26,7 +79,12 @@ body {background-color: #ddd;}
 
 @media (max-width: 768px) {
   .container {margin: 12px; padding: 16px; width: auto;}
-  .url-cell {
-    max-width: 150px;
-  }
+  .page {padding: 8px 16px 48px}
+  .search {padding: 14px 18px; font-size: 1.9rem}
+  #results a {grid-template-columns: 32px minmax(0, 1fr) auto; row-gap: 0}
+  #results .avatar {grid-row: span 2}
+  #results .url {grid-column: 2; grid-row: 2; font-size: .85rem}
+  #results .trash {grid-column: 3; grid-row: 1 / span 2}
+  #recent .go {font-size: 1.25rem}
+  #links th, #links td {padding: 10px 8px}
 }
