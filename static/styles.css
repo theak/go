@@ -15,6 +15,7 @@ body {background-color: #f7f6f3;}
 .topbar {display: flex; align-items: baseline; gap: 12px; padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line)}
 .topbar .logo {font-size: 1.6rem; font-weight: 500; color: var(--ink); text-decoration: none}
 .topbar .tagline {color: var(--muted)}
+.topbar .gear {align-self: center}
 .page {max-width: 1000px; margin: 0 auto; padding: 24px 24px 64px}
 .label {margin: 28px 0 12px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)}
 .panel {background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.04); overflow: hidden}
@@ -31,19 +32,17 @@ body {background-color: #f7f6f3;}
   padding: 10px 12px; border-radius: 10px; color: var(--ink); text-decoration: none;
 }
 #results a:hover {background: var(--soft)}
-#results a:first-child {background: var(--soft)}
+#results a.selected {background: var(--soft)}
 #results .name {font-size: 1.1rem; font-weight: 500}
 #results .name, #results .url {overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
 #results .url {color: var(--muted)}
-#results .open {visibility: hidden; color: var(--muted); font-size: .9rem}
-#results a:first-child .open {visibility: visible}
-#results kbd {background: #fff; color: var(--muted); border: 1px solid var(--line); padding: 0 6px}
 
 .avatar {
   display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
   border-radius: 8px; background: var(--soft); color: var(--muted); font-size: 1rem; flex: none;
 }
-#create {padding: 20px 24px; border-top: 1px solid var(--line)}
+#create {padding: 20px 24px; border-top: 1px solid var(--line); color: var(--muted)}
+#create b {color: var(--ink); font-weight: 500}
 #create .form-control, #create .btn {border-radius: 10px; padding: .6rem 1rem}
 
 #recent {display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); gap: 16px; overflow-x: auto}
@@ -90,7 +89,7 @@ body {background-color: #f7f6f3;}
   #results a {grid-template-columns: 32px minmax(0, 1fr) auto; row-gap: 0}
   #results .avatar {grid-row: span 2}
   #results .url {grid-column: 2; grid-row: 2; font-size: .85rem}
-  #results .open {grid-column: 3; grid-row: 1 / span 2}
+  #results .trash {grid-column: 3; grid-row: 1 / span 2}
   #recent .go {font-size: 1.25rem}
   #links th, #links td {padding: 10px 8px}
   #links .namecell {white-space: normal}

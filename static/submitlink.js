@@ -52,8 +52,10 @@ function deleteLink(btn, link_id, link_name) {
       document.getElementById("banner").innerHTML =
         `<div class="alert alert-success">${link_name} deleted ` +
         `<a href="#" class="link-secondary float-end" onclick="undoDelete(event)">Undo</a></div>`;
-      btn.closest("tr").remove();
-      document.querySelector(`#results a[data-go="${CSS.escape(link.name)}"]`)?.remove();
+      // Drop the link from the table and the search results.
+      for (const el of document.querySelectorAll(`[data-go="${CSS.escape(link.name)}"]`)) {
+        (el.closest("tr") || el).remove();
+      }
       renderRecent();
       filter();
     })
@@ -105,24 +107,49 @@ function filter() {
   document.getElementById("create").hidden = !s || exact;
   document.getElementById("create-name").value = q.value.trim();
   document.getElementById("create-label").textContent = q.value.trim();
+  select(0);
+}
+
+// The selected result is what Enter opens; arrow keys move it.
+let selected = 0;
+function select(i) {
+  const shown = [...results.querySelectorAll("a:not([hidden])")];
+  selected = Math.max(0, Math.min(i, shown.length - 1));
+  shown.forEach((a, j) => a.classList.toggle("selected", j === selected));
+  shown[selected]?.scrollIntoView({ block: "nearest" });
+  return shown[selected];
+}
+
+function clearSearch() {
+  q.value = "";
+  filter();
+  q.focus();
 }
 
 q.addEventListener("input", filter);
 q.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter") return;
-  const first = document.querySelector("#results a:not([hidden])");
-  if (first) {
-    track(first.dataset.go);
-    location.href = first.href;
-  } else {
-    url.focus();
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    select(selected + (e.key === "ArrowDown" ? 1 : -1));
+  } else if (e.key === "Enter") {
+    const a = select(selected);
+    if (a) {
+      track(a.dataset.go);
+      location.href = a.href;
+    } else {
+      url.focus();
+    }
   }
 });
-document.getElementById("clear").addEventListener("click", () => {
-  q.value = "";
-  filter();
-  q.focus();
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && !e.target.matches("input, textarea")) {
+    e.preventDefault();
+    q.focus();
+  } else if (e.key === "Escape" && q.value) {
+    clearSearch();
+  }
 });
+document.getElementById("clear").addEventListener("click", clearSearch);
 // A blank URL creates a note, so the button says which one you'll get.
 url.addEventListener("input", () => {
   document.getElementById("create-btn").textContent = url.value ? "Create link" : "Create note";
