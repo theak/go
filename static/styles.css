@@ -9,9 +9,27 @@ body {background-color: #ddd;}
 .pre {background-color: #FFF;}
 #hosts {display: inline}
 
+.container {max-width: 760px}
+.search {padding-right: 40px}
+.search .form-control {font-size: 1.5rem}
+#links td {vertical-align: middle}
+#links .desc {cursor: pointer; white-space: nowrap; font-size: 1.25rem}
+#links a {text-decoration: none}
+#links td.w-100 {max-width: 0} /* lets the URL ellipsize instead of widening the table */
+
+#recent {display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px}
+#recent:empty {display: none}
+#recent a {
+  display: flex; flex-direction: column; align-items: center; padding: 10px 4px;
+  border-radius: 10px; background: #fff; border: 1px solid #e5e5e5; text-decoration: none;
+  overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+#recent a:hover {border-color: #bbb}
+#recent span {font-size: 1.75rem; line-height: 1.2; max-width: 100%; overflow: hidden; white-space: nowrap}
+#recent small {max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+
 .url-cell {
   cursor: pointer;
-  max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -26,7 +44,6 @@ body {background-color: #ddd;}
 
 @media (max-width: 768px) {
   .container {margin: 12px; padding: 16px; width: auto;}
-  .url-cell {
-    max-width: 150px;
-  }
+  #links .desc {white-space: normal; max-width: 35vw; font-size: 1rem}
+  #recent span {font-size: 1.5rem}
 }
