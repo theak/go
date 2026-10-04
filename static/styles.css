@@ -24,10 +24,14 @@ body {background-color: #f0f0f3;}
 #recent span {font-size: 1.6rem; line-height: 1.2; max-width: 100%; overflow: hidden; white-space: nowrap}
 #recent small {max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
 
-#results {display: grid; gap: 6px}
+#results {display: flex; flex-direction: column; padding: 4px; border-radius: 14px; background: #f6f6f8}
 #results:not(:has(a:not([hidden]))) {display: none}
-#results a {padding: 10px 14px; border-radius: 12px; background: #f6f6f8; color: inherit; text-decoration: none}
-#results a:hover {background: #ebebef}
+#results a {position: relative; padding: 8px 40px 8px 12px; border-radius: 10px; color: inherit; text-decoration: none}
+#results a:hover {background: #ececf0}
+#results a:first-child {background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08)}
+#results a:first-child::after {content: "↵"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #aaa}
+#results .name, #results .url {display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+#results .url {color: #999}
 #links td {vertical-align: middle}
 #links a {text-decoration: none}
 

@@ -24,13 +24,10 @@
 
       <div id="results" class="mt-3">
         {% for link in links %}
-        <a hidden
-           href="{{ link.url }}" target="_blank" data-go="{{ link.name }}" data-desc="{{ link.description or '' }}"
-           data-search="{{ link.name|lower }} {{ (link.description or '')|lower }} {{ link.url|lower }}">
-          <span class="d-block text-truncate">
-            <b>{{domain}}/{{ link.name }}</b> <span class="text-muted">{{ link.description or '' }}</span>
-            <small class="d-block text-muted text-truncate">{{ link.url }}</small>
-          </span>
+        <a hidden href="{{ link.url }}" target="_blank" data-go="{{ link.name }}" data-desc="{{ link.description or '' }}"
+           data-search="{{ link.name|lower }} {{ (link.description or '')|lower }} {{ link.url.split('?')[0]|lower }}">
+          <span class="name"><b>{{domain}}/{{ link.name }}</b> <span class="text-muted">{{ link.description or '' }}</span></span>
+          <small class="url">{{ link.url.split('://')[-1] }}</small>
         </a>
         {% endfor %}
       </div>

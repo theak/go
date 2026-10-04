@@ -84,14 +84,22 @@ function undoDelete(e) {
 
 const q = document.getElementById("q");
 const recentEl = document.getElementById("recent");
+const results = document.getElementById("results");
 
 function filter() {
   const s = q.value.trim().toLowerCase();
-  let exact = false;
-  for (const a of document.querySelectorAll("#results a")) {
-    a.hidden = !s || !a.dataset.search.includes(s);
-    exact ||= a.dataset.go.toLowerCase() === s;
-  }
+  // Name matches first (exact, then prefix), then description, then URL.
+  const rank = (a) => {
+    const name = a.dataset.go.toLowerCase();
+    return name === s ? 0 : name.startsWith(s) ? 1 : name.includes(s) ? 2
+      : a.dataset.desc.toLowerCase().includes(s) ? 3 : 4;
+  };
+  const items = [...results.children];
+  const hits = !s ? [] : items.filter((a) => a.dataset.search.includes(s))
+    .sort((a, b) => rank(a) - rank(b)).slice(0, 8);
+  for (const a of items) a.hidden = !hits.includes(a);
+  results.prepend(...hits);
+  const exact = hits.length > 0 && rank(hits[0]) === 0;
   recentEl.hidden = !!s;
   document.getElementById("create").hidden = !s || exact;
   document.getElementById("create-name").value = q.value.trim();
