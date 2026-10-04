@@ -68,14 +68,14 @@
       <div class="panel">
         <table id="links" class="table mb-0">
           <thead>
-            <tr><th>Name</th><th>Short link</th><th class="d-none d-md-table-cell">Destination</th><th></th></tr>
+            <tr><th></th><th>Short link</th><th class="d-none d-md-table-cell">Destination</th><th></th></tr>
           </thead>
           <tbody>
             {% for link in links %}
             {% set icon, label = link|icon_label %}
             <tr>
-              <td class="namecell" title="Rename" onclick="rename({{ link.id }}, '{{domain}}/{{ link.name }}')">
-                <span class="avatar">{{ icon }}</span> {{ label or '—' }}
+              <td class="namecell" title="{{ label or 'Click to name' }}" onclick="rename({{ link.id }}, '{{domain}}/{{ link.name }}')">
+                <span class="avatar">{{ icon }}</span>
               </td>
               <td class="text-nowrap"><a href="{{ link.url }}" target="_blank" data-go="{{ link.name }}">{{domain}}/{{ link.name }}</a> <span class="muted">↗</span></td>
               <td class="url-cell d-none d-md-table-cell" title="{{ link.url }}" onclick="editUrl({{ link.id }}, '{{ link.url }}')">
