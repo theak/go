@@ -52,6 +52,7 @@ function deleteLink(btn, link_id, link_name) {
         `<div class="alert alert-success">${link_name} deleted ` +
         `<a href="#" class="link-secondary float-end" onclick="undoDelete(event)">Undo</a></div>`;
       btn.closest("tr").remove();
+      document.querySelector(`#results a[data-go="${CSS.escape(link.name)}"]`)?.remove();
       renderRecent();
       filter();
     })
@@ -82,15 +83,16 @@ function undoDelete(e) {
 /* SEARCH */
 
 const q = document.getElementById("q");
-const rows = () => document.querySelectorAll("#links tbody tr");
+const recentEl = document.getElementById("recent");
 
 function filter() {
   const s = q.value.trim().toLowerCase();
   let exact = false;
-  for (const r of rows()) {
-    r.hidden = !r.dataset.search.includes(s);
-    exact ||= r.dataset.name.toLowerCase() === s;
+  for (const a of document.querySelectorAll("#results a")) {
+    a.hidden = !s || !a.dataset.search.includes(s);
+    exact ||= a.dataset.go.toLowerCase() === s;
   }
+  recentEl.hidden = !!s;
   document.getElementById("create").hidden = !s || exact;
   document.getElementById("create-name").value = q.value.trim();
   document.getElementById("create-label").textContent = q.value.trim();
@@ -100,7 +102,7 @@ function filter() {
 q.addEventListener("input", filter);
 q.addEventListener("keydown", (e) => {
   if (e.key !== "Enter") return;
-  const first = document.querySelector("#links tbody tr:not([hidden]) a");
+  const first = document.querySelector("#results a:not([hidden])");
   if (first) {
     track(first.dataset.go);
     location.href = first.href;
@@ -112,8 +114,6 @@ if (matchMedia("(pointer: fine)").matches) q.focus();
 filter();
 
 /* RECENT LINKS (stored per-device in localStorage) */
-
-const recentEl = document.getElementById("recent");
 
 function loadRecent() {
   try { return JSON.parse(localStorage.getItem("recent")) || []; } catch { return []; }
@@ -130,7 +130,7 @@ function track(name) {
 
 function renderRecent() {
   recentEl.replaceChildren(...loadRecent().map((name) => {
-    const link = document.querySelector(`#links a[data-go="${CSS.escape(name)}"]`);
+    const link = document.querySelector(`#results a[data-go="${CSS.escape(name)}"]`);
     if (!link) return "";
     const a = document.createElement("a");
     a.href = link.href;
@@ -138,8 +138,8 @@ function renderRecent() {
     a.dataset.go = name;
     a.innerHTML = `<span></span><small></small>`;
     // Use the leading emoji of the description as the icon.
-    a.firstChild.textContent = link.closest("tr").dataset.desc.match(/^\P{L}*/u)[0].trim() || "🔗";
-    a.lastChild.textContent = link.textContent;
+    a.firstChild.textContent = link.dataset.desc.match(/^\P{L}*/u)[0].trim() || "🔗";
+    a.lastChild.textContent = link.querySelector("b").textContent;
     return a;
   }));
 }

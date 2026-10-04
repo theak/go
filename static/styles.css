@@ -1,7 +1,7 @@
-body {background-color: #ddd;}
-.container {padding: 30px; margin: 60px auto; background-color: #FAFAFA; border-radius: 10px}
+body {background-color: #f0f0f3;}
+.container {padding: 30px; margin: 40px auto; background-color: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06)}
 .nopad {padding: 0px}
-.gear {margin-top: -10px; margin-right: 3px; float: right; opacity: 0.6; transition: opacity .2s ease-out}
+.gear {opacity: 0.5; transition: opacity .2s ease-out}
 .gear:hover {opacity: 1.0}
 
 .domain {display: inline; width: 90%;}
@@ -9,27 +9,31 @@ body {background-color: #ddd;}
 .pre {background-color: #FFF;}
 #hosts {display: inline}
 
-.container {max-width: 760px}
-.search {padding-right: 40px}
-.search .form-control {font-size: 1.5rem}
-#links td {vertical-align: middle}
-#links .desc {cursor: pointer; white-space: nowrap; font-size: 1.25rem}
-#links a {text-decoration: none}
-#links td.w-100 {max-width: 0} /* lets the URL ellipsize instead of widening the table */
+.home .container {max-width: 800px}
+.search {font-size: 1.25rem; padding: .75rem 1rem; border-radius: 12px; background: #f6f6f8; border-color: transparent}
+.search:focus {background: #fff}
 
 #recent {display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px}
 #recent:empty {display: none}
 #recent a {
-  display: flex; flex-direction: column; align-items: center; padding: 10px 4px;
-  border-radius: 10px; background: #fff; border: 1px solid #e5e5e5; text-decoration: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 4px;
+  border-radius: 12px; background: #f6f6f8; color: #444; text-decoration: none;
   overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
-#recent a:hover {border-color: #bbb}
-#recent span {font-size: 1.75rem; line-height: 1.2; max-width: 100%; overflow: hidden; white-space: nowrap}
+#recent a:hover {background: #ebebef}
+#recent span {font-size: 1.6rem; line-height: 1.2; max-width: 100%; overflow: hidden; white-space: nowrap}
 #recent small {max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+
+#results {display: grid; gap: 6px}
+#results:not(:has(a:not([hidden]))) {display: none}
+#results a {padding: 10px 14px; border-radius: 12px; background: #f6f6f8; color: inherit; text-decoration: none}
+#results a:hover {background: #ebebef}
+#links td {vertical-align: middle}
+#links a {text-decoration: none}
 
 .url-cell {
   cursor: pointer;
+  max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -44,6 +48,5 @@ body {background-color: #ddd;}
 
 @media (max-width: 768px) {
   .container {margin: 12px; padding: 16px; width: auto;}
-  #links .desc {white-space: normal; max-width: 35vw; font-size: 1rem}
-  #recent span {font-size: 1.5rem}
+  #recent span {font-size: 1.4rem}
 }

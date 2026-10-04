@@ -7,55 +7,79 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/styles.css">
   </head>
-  <body>
+  <body class="home">
     <div id="banner">
       {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
       {% if newlink %}<div class="alert alert-success">Created link: <a href="{{ newlink.url }}">go/{{ newlink.name }}</a></div>{% endif %}
       {% if deleted %}<div class="alert alert-success">Deleted {{domain}}/{{ deleted }}</div>{% endif %}
     </div>
     <div class="container">
-      <a class="link-secondary gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
-      <div class="input-group input-group-lg search">
-        <span class="input-group-text">{{domain}}/</span>
-        <input id="q" class="form-control" placeholder="search or create" value="{{ query or '' }}"
+      <div class="d-flex align-items-center gap-3">
+        <input id="q" class="form-control search" placeholder="Search {{domain}}/ links" value="{{ query or '' }}"
                autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
+        <a class="gear" title="Manage Settings" href="/settings"><img src="/static/gear.svg"></a>
       </div>
 
       <div id="recent" class="mt-3" title="Long-press to remove"></div>
 
+      <div id="results" class="mt-3">
+        {% for link in links %}
+        <a hidden
+           href="{{ link.url }}" target="_blank" data-go="{{ link.name }}" data-desc="{{ link.description or '' }}"
+           data-search="{{ link.name|lower }} {{ (link.description or '')|lower }} {{ link.url|lower }}">
+          <span class="d-block text-truncate">
+            <b>{{domain}}/{{ link.name }}</b> <span class="text-muted">{{ link.description or '' }}</span>
+            <small class="d-block text-muted text-truncate">{{ link.url }}</small>
+          </span>
+        </a>
+        {% endfor %}
+      </div>
+
       <form id="create" method="post" action="/submit_link" class="mt-3" hidden>
         <input type="hidden" name="name" id="create-name">
-        <div class="small text-muted mb-2">No {{domain}}/<b id="create-label"></b> yet. Point it at a URL or start a note.</div>
         <div class="input-group">
           <input id="url" type="url" class="form-control" placeholder="https://..." name="url" required>
-          <button type="submit" class="btn btn-primary">Create link</button>
+          <button type="submit" class="btn btn-primary">Create</button>
         </div>
-        <a id="create-note" class="btn btn-outline-secondary mt-2" href="#">🟨 New note</a>
+        <div class="small text-muted mt-2">New link {{domain}}/<b id="create-label"></b>, or <a id="create-note" href="#">start a note</a> instead.</div>
       </form>
-
-      <table id="links" class="table table-hover mt-3 mb-0">
-        <tbody>
-          {% for link in links %}
-          <tr data-name="{{ link.name }}" data-desc="{{ link.description or '' }}"
-              data-search="{{ link.name|lower }} {{ (link.description or '')|lower }} {{ link.url|lower }}">
-            <td class="desc" onclick="rename({{ link.id }}, '{{domain}}/{{ link.name }}')">
-              {% if link.description %}{{ link.description }}{% else %}<span class="text-muted">+</span>{% endif %}
-            </td>
-            <td class="w-100">
-              <a href="{{ link.url }}" target="_blank" data-go="{{ link.name }}">{{domain}}/{{ link.name }}</a>
-              <div class="url-cell small text-muted" title="{{ link.url }}" onclick="editUrl({{ link.id }}, '{{ link.url }}')">
-                {{ link.url|truncate(80) }} <span class="edit-icon">✎</span>
-              </div>
-            </td>
-            <td>
-              <button type="button" class="btn nopad"
-                      onclick="deleteLink(this, {{ link.id }}, '{{domain}}/{{ link.name }}')">🗑️</button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
+
+    {% if links %}
+      <div class="container">
+        <h5 class="mb-3">All links</h5>
+        <div class="table-responsive">
+          <table id="links" class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Name</th><th scope="col">Short Link</th><th scope="col" class="d-none d-md-table-cell">Full URL</th><th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for link in links %}
+              <tr>
+                <td style="cursor: pointer"
+                    onclick="rename({{ link.id }}, '{{domain}}/{{ link.name }}')">
+                  {% if link.description %}{{ link.description }}{% else %}
+                  <button type="button" class="btn btn-outline-secondary btn-sm">Add</button>
+                  {% endif %}
+                </td>
+                <td><a href="{{ link.url }}" target="_blank" data-go="{{ link.name }}">{{domain}}/{{ link.name }}</a></td>
+                <td class="url-cell d-none d-md-table-cell" title="{{ link.url }}" onclick="editUrl({{ link.id }}, '{{ link.url }}')">
+                  <span>{{ link.url|truncate(80) }}</span>
+                  <span class="edit-icon">✎</span>
+                </td>
+                <td>
+                  <button type="button" class="btn nopad"
+                          onclick="deleteLink(this, {{ link.id }}, '{{domain}}/{{ link.name }}')">🗑️</button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
     <script src="/static/submitlink.js"></script>
   </body>
 </html>
