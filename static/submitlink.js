@@ -154,8 +154,11 @@ document.getElementById("clear").addEventListener("click", clearSearch);
 url.addEventListener("input", () => {
   document.getElementById("create-btn").textContent = url.value ? "Create link" : "Create note";
 });
-if (matchMedia("(pointer: fine)").matches) q.focus();
 filter();
+// Arriving via go/<missing-name> pre-fills the name, so jump straight to the URL field.
+if (matchMedia("(pointer: fine)").matches) {
+  (q.value && !document.getElementById("create").hidden ? url : q).focus();
+}
 
 /* RECENT LINKS (stored per-device in localStorage as [{name, t}]) */
 
